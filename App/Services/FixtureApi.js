@@ -20,5 +20,19 @@ export default {
       ok: true,
       data: username.toLowerCase() === 'gantman' ? gantmanData : skellockData
     }
+  },
+  login: (username) => {
+    return {
+      ok:true,
+      data: {"username":username}
+    }
   }
+  //getFriends: (user) => {
+    //const friends = require('../Fixtures/friend_test.json')
+    //return {
+    //  ok:true,
+    //  data: friends
+    //}
+
+  //}
 }

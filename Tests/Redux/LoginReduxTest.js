@@ -24,4 +24,5 @@ test('logout', (t) => {
   const state = reducer(loginState, Actions.logout())
 
   expect(state.username).toBe(false)
+  expect(state.token).toBe(null)
 })

@@ -28,10 +28,9 @@ export const request = (state, { username }) =>
   state.merge({ fetching: true, username, avatar: null })
 
 // successful avatar lookup
-export const success = (state, action) => {
-  const { avatar } = action
-  return state.merge({ fetching: false, error: null, avatar })
-}
+export const success = (state, action) =>
+  state.merge({ fetching: false, error: null, avatar: action.avatar })
+
 
 // failed to get the avatar
 export const failure = (state) =>

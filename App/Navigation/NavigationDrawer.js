@@ -1,18 +1,21 @@
 import React from "react";
-import { DrawerNavigator } from "react-navigation";
-import ListviewExample from "../Containers/ListviewExample";
-import CardExample from "../Containers/CardExample";
+import { DrawerNavigator,StackNavigator} from "react-navigation";
+import ChatRoomScreen from '../Containers/ChatRoomScreen'
+import ChatScreen from '../Containers/ChatScreen'
+import SwipeScreen from "../Containers/SwipeScreen";
+import MeetMeScreen from "../Containers/MeetMeScreen";
 import DrawerContent from "../Containers/DrawerContent";
+import LoginScreen from "../Containers/DrawerContent";
 
 import styles from "./Styles/NavigationStyles";
-
 const NavigationDrawer = DrawerNavigator({
-		ListviewExample: { screen: ListviewExample },
-		CardExample: { screen: CardExample },
+    ChatScreen: { screen: ChatScreen },
+		SwipeScreen: { screen: SwipeScreen },
+		MeetMeScreen: { screen: MeetMeScreen}
 	},
 	{
-		initialRouteName: "ListviewExample",
-		contentComponent: props => <DrawerContent {...props} />,
+		initialRouteName: "SwipeScreen",
+		contentComponent: props => <DrawerContent {...props} />
 	}
 );
 

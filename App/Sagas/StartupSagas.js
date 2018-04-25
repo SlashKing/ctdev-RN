@@ -1,40 +1,34 @@
-import { put, select } from 'redux-saga/effects'
-import GithubActions from '../Redux/GithubRedux'
+import { put, select, call } from 'redux-saga/effects'
+import LoginActions,{isLoggedIn, isNew, asyncExpiry} from '../Redux/LoginRedux'
+import ChatTypes from '../Redux/ChatRedux'
+import AppStateActions from '../Redux/AppStateRedux'
+import { ChatAPI } from '../Services/ChatAPI'
 import { is } from 'ramda'
 
-// exported to make available for tests
-export const selectAvatar = (state) => state.github.avatar
+import ReduxPersist from "../Config/ReduxPersist";
+export function * startup (api, action) {
+  // Set initial reducer values to determine where the user should be navigated to on the login screen
+  const tokenInMemory = yield isLoggedIn(null)
+  const signedUp = yield isNew(null)
+  const expiry = yield asyncExpiry(null)
+  api.setHeader('Authorization',tokenInMemory == null ? '' : `JWT ${tokenInMemory}`)
+  // if token exists set isAuthenticated and token value in reducer[login] is not expired
+  if (tokenInMemory) {
+    if(expiry >= new Date().getMilliseconds()){
+      const response = yield call(api.fetchCurrentUser)
+      // we made it!
+      if (response.ok) {
+        yield put(LoginActions.autoLogin(tokenInMemory, expiry, response.data))
+        ChatAPI.connect(tokenInMemory);
+        ChatAPI.listen(action.store);
 
-// process STARTUP actions
-export function * startup (action) {
-  if (__DEV__ && console.tron) {
-    // straight-up string logging
-    console.tron.log('Hello, I\'m an example of how to log via Reactotron.')
-
-    // logging an object for better clarity
-    console.tron.log({
-      message: 'pass objects for better logging',
-      someGeneratorFunction: selectAvatar
-    })
-
-    // fully customized!
-    const subObject = { a: 1, b: [1, 2, 3], c: true }
-    subObject.circularDependency = subObject // osnap!
-    console.tron.display({
-      name: '🔥 IGNITE 🔥',
-      preview: 'You should totally expand this',
-      value: {
-        '💃': 'Welcome to the future!',
-        subObject,
-        someInlineFunction: () => true,
-        someGeneratorFunction: startup,
-        someNormalFunction: selectAvatar
+      }else{
+        yield put(LoginActions.loginFailure(response.data))
       }
-    })
+    }
   }
-  const avatar = yield select(selectAvatar)
-  // only get if we don't have it yet
-  if (!is(String, avatar)) {
-    yield put(GithubActions.userRequest('GantMan'))
+
+	if (ReduxPersist.active) {
+    yield put(AppStateActions.setRehydrationComplete())
   }
 }

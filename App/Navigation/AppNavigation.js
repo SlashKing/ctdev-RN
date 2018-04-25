@@ -3,18 +3,29 @@ import { StackNavigator } from "react-navigation";
 import styles from "./Styles/NavigationStyles";
 
 // screens identified by the router
-import Login from "../Containers/LoginScreen";
-import LaunchScreen from "../Containers/LaunchScreen";
+import LoginScreen from "../Containers/LoginScreen";
+import SocialSignupScreen from "../Containers/SocialSignupScreen";
+import SignupScreen from "../Containers/SignupScreen";
+import UserProfileScreen from "../Containers/UserProfileScreen";
+import ChatRoomScreen from "../Containers/ChatRoomScreen";
 import NavigationDrawer from "./NavigationDrawer";
 
+const AuthStack = StackNavigator({
+		LoginScreen: { screen: LoginScreen },
+		SocialSignupScreen: { screen: SocialSignupScreen },
+		SignupScreen: { screen: SignupScreen }
+		})
 const PrimaryNav = StackNavigator(
 	{
-		Login: { screen: Login },
-		LaunchScreen: { screen: LaunchScreen },
+		LoginScreen: { screen: LoginScreen },
+		SocialSignupScreen: { screen: SocialSignupScreen },
+		SignupScreen: { screen: SignupScreen },
 		NavigationDrawer: { screen: NavigationDrawer },
+	  UserProfileScreen: { screen: UserProfileScreen},
+	  ChatRoomScreen: {screen: ChatRoomScreen}
 	},
 	{
-		initialRouteName: "Login",
+		initialRouteName: "LoginScreen",
 		headerMode: "none",
 	}
 );

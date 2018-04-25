@@ -3,7 +3,6 @@ import { Colors, Metrics } from '../../Themes'
 
 export default StyleSheet.create({
   container: {
-    paddingTop: 70,
     backgroundColor: Colors.background
   },
   form: {
@@ -18,6 +17,7 @@ export default StyleSheet.create({
     flex: 1
   },
   rowLabel: {
+    fontFamily:"Lobster13",
     color: Colors.charcoal
   },
   textInput: {
@@ -35,7 +35,7 @@ export default StyleSheet.create({
     marginTop: 10
   },
   loginButtonWrapper: {
-    flex: 1
+    flex: 1,
   },
   loginButton: {
     flex: 1,
@@ -50,6 +50,6 @@ export default StyleSheet.create({
   },
   topLogo: {
     alignSelf: 'center',
-    resizeMode: 'contain'
+    resizeMode: 'stretch'
   }
 })

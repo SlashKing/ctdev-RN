@@ -1,8 +1,7 @@
 // a library to wrap and simplify api calls
 import apisauce from 'apisauce'
-
 // our "constructor"
-const create = (baseURL = 'https://api.github.com/') => {
+const create = (baseURL = 'http://192.168.0.13:8000/') => {
   // ------
   // STEP 1
   // ------
@@ -14,30 +13,53 @@ const create = (baseURL = 'https://api.github.com/') => {
     baseURL,
     // here are some default headers
     headers: {
+      "Accept": "application/json",
+    	"Content-Type": "application/json",
       'Cache-Control': 'no-cache'
     },
     // 10 second timeout...
     timeout: 10000
   })
 
-  // ------
-  // STEP 2
-  // ------
-  //
-  // Define some functions that call the api.  The goal is to provide
-  // a thin wrapper of the api layer providing nicer feeling functions
-  // rather than "get", "post" and friends.
-  //
-  // I generally don't like wrapping the output at this level because
-  // sometimes specific actions need to be take on `403` or `401`, etc.
-  //
-  // Since we can't hide from that, we embrace it by getting out of the
-  // way at this level.
-  //
+
+  /** Fixture **/
   const getRoot = () => api.get('')
   const getRate = () => api.get('rate_limit')
-  const getUser = (username) => api.get('search/users', {q: username})
 
+  // Friends
+  const fetchFriends = (user) => api.get(`friends/${user}/`,{})
+
+  // Users
+  const fetchUsers = () => api.get('api/users/',{limit: 25})
+  // TODO: add a custom request that will implement algorithm to choose most likely matches based on matching facebook interests/likes
+  // TODO: will save the aforementioned list to an index for more efficient retrieval and less strain on database requests.
+  const fetchCurrentUser = () => api.get('api/users/i/',{})
+  const getUser = (username) => api.get(`api/users/${username}/`, {})
+  const patchUser = (data) => api.patch(`api/users/${data.id}/`,{...data})
+  const patchProfile = (data) => api.patch(`api/user_profiles/${data.p_id}/`,{...data})
+  // Swipe
+  const swipe = (vote, current_user, user, content_type) => api.post('api/likes/',{vote:vote, token: current_user, object_id: user, content_type:content_type })
+  const deleteVotes = (current_user) => api.post(`api/likes/${current_user}/delete_all/`,{})
+  // Meet Map
+
+  const fetchMeetMapUsers = (lat, lon, distance) => api.get('api/meetmap/',{lat, lon, distance})
+
+  // Notifications
+  const fetchNotifications = (user) => api.get(`api/notifications/${user}/`, {})
+
+  // Chat
+  const fetchRooms = (user) => api.get(`api/rooms/${user}`,{})
+
+  // Login
+  const checkSocialLogin = (accessToken) => api.post('rest-auth/facebook/',{access_token:accessToken})
+  const passwordChange = (data) => api.post('rest-auth/password/change/',{new_password1: data.new_password1, new_password2: data.new_password2})
+  const passwordReset = (email) => api.post('rest-auth/password/reset/',{email})
+  const passwordResetConfirm = (email) => api.post('rest-auth/password/reset/',{email})
+  const loginUser = (username,password) => api.post('rest-auth/login/',{username,password})
+  const logout = (token) => api.post('rest-auth/logout/',{token})
+  const registerUser = (username, password1, password2, email, birthday, latitude, longitude) => api.post('rest-auth/registration/',{username, password1, password2, email, birthday, latitude, longitude})
+  const signUp = ({data}) => api.post('users/',{data})
+  const setHeader = (key, value)=> api.setHeader(key, value)
   // ------
   // STEP 3
   // ------
@@ -51,14 +73,27 @@ const create = (baseURL = 'https://api.github.com/') => {
   // private scoped goodies in JavaScript.
   //
   return {
-    // a list of the API functions from step 2
+    swipe,
+    setHeader,
     getRoot,
     getRate,
-    getUser
+    getUser,
+    fetchCurrentUser,
+    passwordChange,
+    patchUser,
+    patchProfile,
+    fetchUsers,
+    fetchMeetMapUsers,
+    fetchFriends,
+    fetchRooms,
+    fetchNotifications,
+    checkSocialLogin,
+    logout,
+    loginUser,
+    registerUser,
+    signUp,
   }
 }
-
-// let's return back our create method as the default.
 export default {
   create
 }
