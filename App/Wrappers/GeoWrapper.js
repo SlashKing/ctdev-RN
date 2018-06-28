@@ -6,18 +6,23 @@ function geoWrap(WrappedComponent, watch=false){
     function getDisplayName(WrappedComponent){
       return WrappedComponent.displayName || WrappedComponent.name || 'Component';
     }
-    return class extends WrappedComponent{
+    return class extends React.Component{
       constructor(props,context){
         super(props,context)
         this.state = {
           latitude: null,
           longitude: null,
-          locationRetrievalFailed: false
+          locationRetrievalFailed: false,
+          locationRetries:0
         }
+
       }
-      componentDidMount(){
-        console.log('gothere')
-        getCoordinates(this,watch);
+      async componentDidMount(){
+        this._mounted = true
+        await getCoordinates(this,watch);
+      }
+      componentWillUnmount(){
+        this._mounted = false
       }
       render(){
         return <WrappedComponent {...this.props} {...this.state} />

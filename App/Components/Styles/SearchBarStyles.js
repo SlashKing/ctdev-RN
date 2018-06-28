@@ -5,9 +5,8 @@ export default StyleSheet.create({
   container: {
     flex: 1,
     marginTop: Metrics.smallMargin,
-    backgroundColor: Colors.transparent,
+    justifyContent: 'flex-start',
     flexDirection: 'row',
-    width: Metrics.screenWidth - Metrics.baseMargin
   },
   searchInput: {
     flex: 5,
@@ -17,23 +16,31 @@ export default StyleSheet.create({
     textAlign: 'left',
     fontFamily: Fonts.type.base,
     fontSize: Fonts.size.instructions,
-    borderRadius: 5,
-    borderWidth: 1,
-    borderColor: Colors.snow,
-    paddingLeft: 30,
-    color: Colors.snow,
+    //backgroundColor: Colors.white,
+    //borderTopLeftRadius: 3,
+    //borderBottomLeftRadius:3,
+    //borderWidth: 0.3,
+    //borderColor: Colors.charcoalLight,
+    color: Colors.black,
     flexDirection: 'row'
   },
   searchIcon: {
-    left: Metrics.doubleBaseMargin,
     alignSelf: 'center',
-    color: Colors.snow,
-    backgroundColor: Colors.transparent
+    color: Colors.charcoal,
+    paddingLeft: 3,
+    //backgroundColor: Colors.transparent,
+    //flex:1,
   },
   cancelButton: {
+    flex:2,
+    height: Metrics.searchBarHeight,
+    borderColor: Colors.charcoalLight,
+    borderWidth:0.3,
+    borderLeftWidth: 0,
+    paddingRight:3,
+    backgroundColor: Colors.charcoalLight,
     alignItems: 'center',
     justifyContent: 'center',
-    marginHorizontal: Metrics.baseMargin
   },
   buttonLabel: {
     color: Colors.snow,

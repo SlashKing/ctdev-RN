@@ -55,13 +55,20 @@ export const ChatAPI = {
     return _connected;
   },
   connect: (token) => {
-    const scheme = window.location.protocol === 'https:' ? 'wss' : 'ws';
+    const scheme = 'ws';
     // TODO: revisit this when/if WebSocket supports Authorization Headers. Currently passing in querystring
     // TODO: custom encoding before transmission, decode on server-side
+    console.log(token, _socket)
+    _socket !== null && _socket.close(1000,'new connection',{keepClosed: true, fastClose: true})
     const url = `${scheme}://192.168.0.13:8000/?token=${token}`;
     _socket = new ReconnectingWebSocket(url, ['chat'], {debug: true, reconnectInterval: 1000});
   },
-
+  getStore: () => {
+    return _store
+  },
+  setStore: (store) => {
+    _store = store
+  },
   listen: (store) => {
 
 	  _socket.onmessage = (event) => {
@@ -76,7 +83,6 @@ export const ChatAPI = {
 	        if (_store.login.currentUser !== null) {
 	          //console.log('logging into chat service api')
 	          reconnect(_store);
-	          _connected=true;
 	        };
 	      };
 	      _socket.onerror = () => {

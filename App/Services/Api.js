@@ -30,16 +30,20 @@ const create = (baseURL = 'http://192.168.0.13:8000/') => {
   const fetchFriends = (user) => api.get(`friends/${user}/`,{})
 
   // Users
-  const fetchUsers = () => api.get('api/users/',{limit: 25})
+  const fetchUsers = () => api.get('api/users/',{limit: 5})
   // TODO: add a custom request that will implement algorithm to choose most likely matches based on matching facebook interests/likes
   // TODO: will save the aforementioned list to an index for more efficient retrieval and less strain on database requests.
   const fetchCurrentUser = () => api.get('api/users/i/',{})
   const getUser = (username) => api.get(`api/users/${username}/`, {})
   const patchUser = (data) => api.patch(`api/users/${data.id}/`,{...data})
   const patchProfile = (data) => api.patch(`api/user_profiles/${data.p_id}/`,{...data})
+  const addProfilePicture = (data) => api.post('api/user_profiles/add_profile_picture/', {...data})
+  const switchPriority = (data) => api.post('api/user_profiles/switch_priority/', {...data})
+
   // Swipe
-  const swipe = (vote, current_user, user, content_type) => api.post('api/likes/',{vote:vote, token: current_user, object_id: user, content_type:content_type })
-  const deleteVotes = (current_user) => api.post(`api/likes/${current_user}/delete_all/`,{})
+  const swipe = (vote, current_user, user, content_type) => api.post('api/likes/swipe/',{vote:vote, token: current_user, object_id: user, content_type:content_type })
+  const deleteVotes = (data) => api.post(`api/user_profiles/${data.p_id}/delete_votes/`,{})
+
   // Meet Map
 
   const fetchMeetMapUsers = (lat, lon, distance) => api.get('api/meetmap/',{lat, lon, distance})
@@ -48,7 +52,12 @@ const create = (baseURL = 'http://192.168.0.13:8000/') => {
   const fetchNotifications = (user) => api.get(`api/notifications/${user}/`, {})
 
   // Chat
+  const unmatchUser = (user) => api.post(`api/likes/${user}/unmatch`,{})
   const fetchRooms = (user) => api.get(`api/rooms/${user}`,{})
+  const createFileMessage = (data) => api.post('api/messages/',{...data})
+  const flagMessage = (data) => api.post(`api/messages/${data.id}/add_flag/`,{reason:data.reason, comment: data.comment})
+  const removeMessageFlag = (data) => api.post(`api/messages/${data.id}/remove_flag_instances/`,{})
+  const reportUser = (data) => api.post(`api/users/${data.userId}/report/`,{report_type:data.report_type, comment: data.comment})
 
   // Login
   const checkSocialLogin = (accessToken) => api.post('rest-auth/facebook/',{access_token:accessToken})
@@ -78,14 +87,22 @@ const create = (baseURL = 'http://192.168.0.13:8000/') => {
     getRoot,
     getRate,
     getUser,
+    deleteVotes,
     fetchCurrentUser,
     passwordChange,
     patchUser,
     patchProfile,
+    addProfilePicture,
+    switchPriority,
     fetchUsers,
     fetchMeetMapUsers,
     fetchFriends,
+    unmatchUser,
     fetchRooms,
+    createFileMessage,
+    flagMessage,
+    removeMessageFlag,
+    reportUser,
     fetchNotifications,
     checkSocialLogin,
     logout,

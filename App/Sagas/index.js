@@ -18,10 +18,11 @@ import { SwipeTypes } from '../Redux/SwipeRedux'
 import { startup } from './StartupSagas'
 import {
   loginUser, updateLocation, patchUser, patchProfile, registerUser,
-  logout, checkSocialLogin, passwordChange, passwordReset, passwordResetConfirm
+  logout, checkSocialLogin, passwordChange, passwordReset, passwordResetConfirm,
+  addProfilePicture, switchPriority
 } from './LoginSagas'
-import { fetchUsers, swipe } from './SwipeSagas'
-import { fetchRooms } from './ChatSagas'
+import { fetchUsers, swipe, deleteVotes } from './SwipeSagas'
+import { unmatchUser, reportUser, fetchRooms, sendMessage, flagMessage, removeMessageFlag } from './ChatSagas'
 import { fetchFriends } from './FriendsSagas'
 import { fetchMeetMapUsers } from './MeetMapSagas'
 
@@ -34,6 +35,7 @@ const api = API.create()
 /* ------------- Connect Types To Sagas ------------- */
 
 export default function * root () {
+try{
   yield all([
     takeLatest(StartupTypes.STARTUP, startup,api),
     takeLatest(LoginTypes.LOGIN_REQUEST, loginUser, api),
@@ -46,10 +48,20 @@ export default function * root () {
     takeLatest(LoginTypes.PASSWORD_RESET_REQUEST, passwordReset, api),
     takeLatest(LoginTypes.PASSWORD_RESET_CONFIRM_REQUEST, passwordResetConfirm, api),
     takeLatest(LoginTypes.LOCATION_REQUEST, updateLocation, api),
+    takeLatest(LoginTypes.ADD_PROFILE_PICTURE_REQUEST, addProfilePicture, api),
+    takeLatest(LoginTypes.SWITCH_PRIORITY_REQUEST, switchPriority, api),
+    takeLatest(ChatTypes.REPORT_USER, reportUser, api),
+    takeLatest(ChatTypes.FLAG_MESSAGE, flagMessage, api),
+    takeLatest(ChatTypes.REMOVE_MESSAGE_FLAG, removeMessageFlag, api),
     takeLatest(ChatTypes.FETCH_ROOMS_REQUEST, fetchRooms,api),
+    takeLatest(ChatTypes.CREATE_FILE_MESSAGE, sendMessage, api),
+    takeLatest(ChatTypes.UNMATCH_USER, unmatchUser, api),
     takeLatest(FriendsTypes.FETCH_FRIENDS_REQUEST, fetchFriends,api),
-    takeLatest(SwipeTypes.FETCH_USERS_REQUEST, fetchUsers,api),
+    takeLatest(SwipeTypes.FETCH_USERS_REQUEST, fetchUsers ,api),
     takeLatest(SwipeTypes.SWIPE_REQUEST, swipe, api),
+    takeLatest(SwipeTypes.DELETE_VOTES_REQUEST, deleteVotes, api),
     takeLatest(MeetMapTypes.MEET_MAP_REQUEST, fetchMeetMapUsers,api)
   ]);
+}catch(err){
+  console.log(err)}
 }

@@ -4,7 +4,18 @@ const type = {
   emphasis: 'HelveticaNeue-Italic',
   lobster: 'Lobster13'
 }
-
+const shadow = {
+  sm: {
+    textShadowColor: 'rgba(0, 0, 0, 0.6)',
+    textShadowOffset: {width:0, height: -1},
+    textShadowRadius: 8,
+  },
+  md: {
+    textShadowColor: 'rgba(0, 0, 0, 0.75)',
+    textShadowOffset: {width:0, height: -1},
+    textShadowRadius: 12,
+  }
+}
 const size = {
   h1: 38,
   h2: 34,
@@ -21,7 +32,7 @@ const size = {
 
 const style = {
   h1: {
-    fontFamily: type.base,
+    fontFamily: type.lobster,
     fontSize: size.h1
   },
   h2: {
@@ -51,10 +62,19 @@ const style = {
   description: {
     fontFamily: type.base,
     fontSize: size.medium
-  }
+  },
+  lobsterSm: {
+    fontFamily: type.lobster,
+    fontSize:size.small
+  },
+  lobsterMd: {
+    fontFamily: type.lobster,
+    fontSize: size.medium
+  },
 }
 
 export default {
+  shadow,
   type,
   size,
   style

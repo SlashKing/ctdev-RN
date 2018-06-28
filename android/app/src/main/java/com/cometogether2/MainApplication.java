@@ -3,6 +3,8 @@ package com.cometogether2;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import org.reactnative.camera.RNCameraPackage;
+import com.brentvatne.react.ReactVideoPackage;
 import fr.bamlab.rnimageresizer.ImageResizerPackage;
 import com.imagepicker.ImagePickerPackage;
 import com.rnfs.RNFSPackage;
@@ -41,16 +43,18 @@ public class MainApplication extends Application implements ReactApplication {
     @Override
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
-          new MainReactPackage(),
-            new ImageResizerPackage(),
-            new ImagePickerPackage(),
-            new RNFSPackage(),
-      //new RNDeviceInfo(),
-            //new ReactNativeConfigPackage(),
-            new VectorIconsPackage(),
-            new MapsPackage(),
-            new ReactNativeI18n(),
-            new FBSDKPackage(mCallbackManager)
+        new MainReactPackage(),
+        new RNCameraPackage(),
+        new ReactVideoPackage(),
+        new ImageResizerPackage(),
+        new ImagePickerPackage(),
+        new RNFSPackage(),
+        //new RNDeviceInfo(),
+        //new ReactNativeConfigPackage(),
+        new VectorIconsPackage(),
+        new MapsPackage(),
+        new ReactNativeI18n(),
+        new FBSDKPackage(mCallbackManager)
       );
     };
   };

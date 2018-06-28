@@ -15,8 +15,8 @@ const store = createStore()
  * We separate like this to play nice with React Native's hot reloading.
  */
 class App extends Component {
-  constructor(props){
-    super(props);
+  constructor(props,context){
+    super(props, context);
 
     }
   componentDidMount(){

@@ -9,7 +9,7 @@ class MeetMeScreen extends React.Component {
   render(){
     return (
       <MeetMap />
-  )
+    )
   }
 }
 export default MeetMeScreen

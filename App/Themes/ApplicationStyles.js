@@ -44,7 +44,10 @@ const ApplicationStyles = {
       ...Fonts.style.h2,
       fontSize: 14,
       color: Colors.text
-    }
+    },
+    header:{
+      backgroundColor: Colors.steel,
+    },
   },
   darkLabelContainer: {
     padding: Metrics.smallMargin,
@@ -74,6 +77,11 @@ const ApplicationStyles = {
     borderColor: Colors.ember,
     alignItems: 'center',
     textAlign: 'center'
+  },
+  rowAlignBottom:{
+    flexDirection:'row',
+    justifyContent:'flex-end',
+    alignItems:'flex-end'
   }
 }
 

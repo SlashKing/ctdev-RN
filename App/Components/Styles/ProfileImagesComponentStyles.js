@@ -4,10 +4,10 @@ export default StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    paddingBottom:60
   },
   barContainer: {
     position: 'absolute',
-    zIndex: 2,
     top: 40,
     flexDirection: 'row',
   },

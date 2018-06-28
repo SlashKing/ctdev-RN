@@ -34,7 +34,7 @@ export default StyleSheet.create({
       //width:null,
       //flex:7,
       //position:'absolute',
-      borderWidth: 0.5,
+      borderWidth: 0,
       borderColor: '#ddd',
       borderTopLeftRadius:8,
       borderTopRightRadius:8,
@@ -43,10 +43,9 @@ export default StyleSheet.create({
       elevation:4,
       flex:3,
       alignItems:'center',
-      paddingTop:10
+      paddingTop:10,
     },
     info2: {
-    elevation:9,
       backgroundColor:'white',
       borderBottomWidth:1,
       borderColor: '#ddd',
@@ -59,21 +58,28 @@ export default StyleSheet.create({
       alignItems:'center',
       flexDirection:'row'
     },
-    aboutText: { flex: 1, flexGrow: 1 },
+    aboutText: { flex: 1, flexGrow: 1, ...Fonts.style.description },
     ageText: { flex:1, flexGrow:1, fontSize:10 },
     kmText: { flex:1, flexGrow:1, fontSize:10 },
-    usernameText: {paddingLeft: 7,padding:4,overflow:'visible',flex:3,textAlign:'center', fontFamily: Fonts.type.lobster},
+    usernameText: {
+      paddingLeft: 7,
+      padding:4,
+      overflow:'visible',
+      flex:3,
+      textAlign:'center',
+      ...Fonts.style.lobsterSm
+    },
     ageDistanceAside: {
       flex:1,
       flexDirection:'column',
       alignItems:'flex-end'
     },
     goToProfile: {
-      borderWidth: 1,
+      borderWidth: 0,
       borderColor: '#ddd',
       borderRadius:500,
       position: 'absolute',
-      elevation:5,
+      elevation:8,
       overflow:'visible',
       right:5,
       top:5,

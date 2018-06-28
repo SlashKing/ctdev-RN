@@ -6,23 +6,22 @@ import styles from "./Styles/NavigationStyles";
 import LoginScreen from "../Containers/LoginScreen";
 import SocialSignupScreen from "../Containers/SocialSignupScreen";
 import SignupScreen from "../Containers/SignupScreen";
-import UserProfileScreen from "../Containers/UserProfileScreen";
-import ChatRoomScreen from "../Containers/ChatRoomScreen";
 import NavigationDrawer from "./NavigationDrawer";
 
 const AuthStack = StackNavigator({
 		LoginScreen: { screen: LoginScreen },
 		SocialSignupScreen: { screen: SocialSignupScreen },
 		SignupScreen: { screen: SignupScreen }
-		})
+	},
+	{
+	  initialRouteName:"LoginScreen",
+	  headerMode:"none"
+	}
+)
 const PrimaryNav = StackNavigator(
 	{
-		LoginScreen: { screen: LoginScreen },
-		SocialSignupScreen: { screen: SocialSignupScreen },
-		SignupScreen: { screen: SignupScreen },
+	  LoginScreen : { screen: AuthStack},
 		NavigationDrawer: { screen: NavigationDrawer },
-	  UserProfileScreen: { screen: UserProfileScreen},
-	  ChatRoomScreen: {screen: ChatRoomScreen}
 	},
 	{
 		initialRouteName: "LoginScreen",

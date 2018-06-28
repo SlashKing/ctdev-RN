@@ -1,17 +1,24 @@
+'use strict'
 import React from 'react';
-import { connect } from 'react-redux'
-import {BackHandler, Text, View, Image, Dimensions,Alert, TouchableOpacity} from 'react-native'
-import {Toast} from 'native-base'
-import styles from './Styles/SwipeScreenStyles'
-import SwipeActions from '../Redux/SwipeRedux'
-import LoginActions from '../Redux/LoginRedux'
-import SwipeCards from '../Components/SwipeCards'
-import SwipeCard from '../Components/SwipeCard'
-import {geoWrap} from '../Wrappers/GeoWrapper'
-import {backListener} from '../Wrappers/BackListener'
-const deviceWidth = Dimensions.get('window').width
-const deviceHeight = Dimensions.get('window').height
-import RippleLoader from '../Components/RippleLoader'
+import { connect } from 'react-redux';
+import {BackHandler, Text, View, Image, Dimensions,Alert, TouchableOpacity, Modal} from 'react-native';
+import {Toast, Container, Thumbnail, Button} from 'native-base';
+import styles from './Styles/SwipeScreenStyles';
+import SwipeActions from '../Redux/SwipeRedux';
+import LoginActions from '../Redux/LoginRedux';
+import ChatActions from '../Redux/ChatRedux';
+import SwipeCards from '../Components/SwipeCards';
+import SwipeCard from '../Components/SwipeCard';
+import {geoWrap} from '../Wrappers/GeoWrapper';
+//import {backListener} from '../Wrappers/BackListener';
+import { Colors } from '../Themes';
+import RippleLoader from '../Components/RippleLoader';
+import {getCoordinates} from '../Lib/LocationUtils';
+import MatchedModal from '../Modals/MatchedModal';
+import { I18n } from '../I18n';
+
+const deviceWidth = Dimensions.get('window').width;
+const deviceHeight = Dimensions.get('window').height;
 
 class NoMoreCards extends React.Component {
   constructor(props) {
@@ -23,14 +30,15 @@ class NoMoreCards extends React.Component {
       <View style={styles.noMoreCards}>
         <Text>No more cards</Text>
       </View>
-    )
+    );
   }
 }
 
 class SwipeScreen extends React.Component {
-  constructor(props,context) {
-    super(props,context);
+  constructor(props) {
+    super(props);
     this.state = {
+      isOpen: false,
       layout:{
         height:deviceHeight,
         width:deviceWidth,
@@ -47,31 +55,45 @@ class SwipeScreen extends React.Component {
     });
   }
   componentWillReceiveProps(nextProps){
-    if (nextProps.latitude !== null && nextProps.latitude !== this.props.latitude){
-    console.log('gothere')
-      this.props.updateLocation(this.props.currentProfileId, nextProps.latitude, nextProps.longitude);
+    if (this.state.latitude !== null && nextProps.latitude !== this.state.latitude){
       //await this.props.fetchUsers();
     }
-    nextProps.locationRetrievalFailed !== this.props.locationRetrievalFailed &&
-      Toast.show({
-        text: nextProps.error,
-        position: 'bottom',
-        buttonText: 'Okay',
-        duration: 2500
-      })
   }
-  componentDidMount(){ }
-  componentWillUnmount(){ }
+
+  componentWillUnmount(){
+    if(this.state.isOpen) this.setModalVis(false);
+  }
+
   handleYup (card, swipe, currentProfileId) {
-   swipe(1, currentProfileId, card.profile.id, card.profile.content_type)
+    swipe({
+        vote: 1,
+        this_user: currentProfileId,
+        user: card,
+        content_type: card.profile.content_type
+      })
   }
 
   handleNope (card, swipe, currentProfileId) {
-   swipe(-1, currentProfileId, card.profile.id, card.profile.content_type)
+    swipe({
+        vote: -1,
+        this_user: currentProfileId,
+        user: card,
+        content_type: card.profile.content_type
+      })
   }
+
   handleMaybe (card, swipe, currentProfileId) {
-   swipe(2, currentProfileId, card.profile.id, card.profile.content_type)
-  }
+    swipe({
+        vote: 2,
+        this_user: currentProfileId,
+        user: card,
+        content_type: card.profile.content_type
+      })
+  };
+
+  setModalVis(vis = null) {
+    this.setState({isOpen: vis == null ? !this.state.isOpen : vis});
+  };
 
   cardRemoved =(index)=> {
     __DEV__ && console.log(`The index is ${index}`);
@@ -81,28 +103,70 @@ class SwipeScreen extends React.Component {
     if (this.props.users.length - index <= CARD_REFRESH_LIMIT + 1) {
       __DEV__ && console.log(`There are only ${this.props.users.length - index - 1} cards left.`);
       this.props.fetchUsers();
-
     }
+  };
 
-  }
-
-  render() {
-  let {loading,loadingUsers, users, swipe, currentProfileId, locationRetrievalFailed} = this.props;
-  return (
-    (users == null || loading || loadingUsers ) ? locationRetrievalFailed ?
-      ( <View style={styles.noMoreCards}>
+  renderLocationFailure(){
+    return (
+      <View style={styles.noMoreCards}>
        <Text>Failed to Retrieve Location</Text>
-      </View> ) : (
-    <View style={styles.noMoreCards}>
-      <RippleLoader/>
-    </View>): (
-      <View onLayout={this._onLayout}  style={{ flex:1, width:this.state.layout.width  }}>
+      </View>
+    )
+  };
+
+  renderLoader(){
+    return (
+      <View style={styles.noMoreCards}>
+        <RippleLoader size={80} />
+      </View>
+    )
+  };
+
+  renderMatchModal(){
+    let {
+      createChatRoom,
+      resetMatch,
+      mega_match,
+      currentMatch,
+      currentRoom,
+      navigation
+    } = this.props;
+
+    return (
+      <MatchedModal
+        ref={el=>this.matchModal = el}
+        containerStyle={{ backgroundColor: mega_match ? Colors.loGreen : Colors.loBlue }}
+        resetMatch={resetMatch}
+        currentMatch={currentMatch}
+        currentRoom={currentRoom}
+        createChatRoom={createChatRoom}
+        megaMatch={mega_match}
+        goToChatRoom={()=>{
+            resetMatch();
+            navigation.navigate("ChatRoomScreen", {room: currentRoom});
+          }
+        }
+      />
+    )
+  };
+
+  renderSwipeCards(){
+    let {
+      users,
+      swipe,
+      currentProfileId,
+      navigation
+    } = this.props;
+
+    __DEV__ && console.log(users);
+
+    return (
       <SwipeCards
         stackOffsetX={0}
         stackDepth={2}
-        cards={this.props.users}
+        cards={users}
         loop={false}
-        smoothTransition={false}
+        smoothTransition={true}
         renderCard={(card, overlays) => <SwipeCard
           layout={this.state.layout} navigation={this.props.navigation} overlays={overlays}
           {...card}/>}
@@ -116,30 +180,56 @@ class SwipeScreen extends React.Component {
         handleYup={(card)=>this.handleYup(card,swipe,currentProfileId)}
         handleNope={(card)=>this.handleNope(card,swipe,currentProfileId)}
         cardRemoved={this.cardRemoved}
-      /></View>
+      />
     )
-  )}
-}
+  };
+  render() {
+    let {
+      loading,
+      locationRetrievalFailed,
+      users
+    } = this.props;
+
+    let { layout } = this.state;
+
+    return (
+      (users == null || loading  ) ? locationRetrievalFailed ?
+        this.renderLocationFailure() : this.renderLoader() : (
+        <View onLayout={this._onLayout}  style={{ flex:1, width:layout.width  }}>
+          { this.renderMatchModal() }
+          { this.renderSwipeCards()}
+        </View>
+      )
+    )
+  };
+};
 
 const mapStateToProps = (state) => {
   return {
-       currentProfileId: state.login.currentUser == null ? undefined : state.login.currentUser.profile.id,
-       users: state.swipe.results,
-       loading: state.login.fetching,
-       loadingUsers: state.swipe.fetching
+    currentUser: state.login.currentUser,
+    currentProfileId: state.login.currentUser == null ? undefined : state.login.currentUser.profile.id,
+    users: state.swipe.results,
+    loading: state.login.fetching,
+    matched: state.swipe.matched,
+    mega_match: state.swipe.mega_match,
+    currentMatch: state.swipe.currentMatch,
+    currentRoom: state.chat.currentRoom
   }
-}
+};
 
 const mapDispatchToProps = (dispatch) => {
   return {
     swipe:(vote, this_user, user, content_type)=> dispatch(SwipeActions.swipeRequest(vote, this_user, user, content_type)),
+    resetMatch: () => dispatch(SwipeActions.resetMatchSuccess()),
     fetchUsers:() => dispatch(SwipeActions.fetchUsersRequest()),
     updateLocation: (id, latitude, longitude) => dispatch(
           LoginActions.locationRequest({
             p_id: id,
             latitude,
-            longitude}))
-  }
-}
+            longitude})),
+    createChatRoom: (users) => dispatch(ChatActions.createChatRoom([users])),
 
-export default connect(mapStateToProps, mapDispatchToProps)(backListener(geoWrap(SwipeScreen,false)))
+  }
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(geoWrap(SwipeScreen))

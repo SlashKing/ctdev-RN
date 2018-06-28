@@ -5,12 +5,24 @@ import AppNavigation from './AppNavigation'
 import {Root} from 'native-base'
 
 // here is our redux-aware our smart component
-function ReduxNavigation (props) {
-  const { dispatch, nav } = props
-  const navigation = ReactNavigation.addNavigationHelpers({
-    dispatch,
-    state: nav
-  })
+import {
+  createReduxBoundAddListener,
+  createReactNavigationReduxMiddleware,
+} from 'react-navigation-redux-helpers';
+
+ReduxNavigation=(props)=>{
+    const { dispatch, nav } = props
+    // Note: createReactNavigationReduxMiddleware must be run before createReduxBoundAddListener
+    const middleware = createReactNavigationReduxMiddleware(
+      "root",
+      state => nav,
+    );
+    const addListener = createReduxBoundAddListener("root");
+    const navigation = ReactNavigation.addNavigationHelpers({
+      dispatch,
+      state: nav,
+      addListener
+    })
   return <Root><AppNavigation navigation={navigation} /></Root>
 }
 

@@ -10,7 +10,7 @@ import GithubActions from "../Redux/GithubRedux";
 import { Button, Text as NBText, Form, Item, Input, Label } from "native-base";
 import {keyboardListener} from '../Wrappers/KeyboardListener'
 import {LoginManager,AccessToken,LoginButton,GraphRequest, GraphRequestManager} from 'react-native-fbsdk';
-
+import {NavigationActions} from 'react-navigation';
 class LoginScreen extends React.Component {
 
 	static propTypes = {
@@ -130,29 +130,33 @@ _responseInfoCallback(error: ?Object, result: ?Object) {
 		// The startup function fetches the user's token from AsyncStorage and sets isAuthenticated
 		// if true: let the user into the app without further authentication
 		// TODO: could update the user's location while checking loggedin status
-		/* TODO: save an expiry time for the token so we know when it needs refreshed without making additional
+		/* TODO: "save an expiry time for the token so we know when it needs refreshed without making additional
 		         network call everytime the user logs in. Problem with this, is if they use the web application
-		         and the token is refreshed, the mobile application will not be recursively updated; oh well.
+		         and the token is refreshed, the mobile application will not be recursively updated; oh well."
 		*/
-		if (newProps.isAuthenticated && !newProps.isNew && this.props.expiry <= Date.now()){
-		  this.props.navigation.navigate('SwipeScreen')
-		}else if (newProps.isAuthenticated && newProps.isNew && newProps.isSocial){
+		  console.log('got here Login', newProps,this.props,  );
+		if (newProps.isAuthenticated !== this.props.isAuthenticated && newProps.isAuthenticated && newProps.isNew !== this.props.isNew && !newProps.isNew && newProps.expiry >= Date.now()/1000){
+       this.props.navigation.dispatch({type:"Navigation/RESET", index:0, key:null, actions: [{ type: 'Navigate', routeName: 'NavigationDrawer' }]})
+
+		}//else if (newProps.isAuthenticated && newProps.isNew && newProps.isSocial){
 		  // first time sign up through facebook where no account was found for the access token provided should initiate the sign up screen
 		  // let's go to the sign up screen
 		   //this.props.navigation.navigate("SignupScreen")
 		  /* newProps.isSocial ? this.props.navigation.navigate("SocialSignupScreen") :*/
-		}
+		//}
 	}
 
 	componentDidMount() {
+		  console.log('got here Login',this.props);
       /*** if the values from AsyncStorage tell us that the user has a valid accessToken based on the
             expiry time of the fb and JWT tokens, just navigate straight to the SwipeScreen ***/
-      if(this.props.isAuthenticated && !this.props.isNew && this.props.expiry <= Date.now()){
-        this.props.navigation.navigate("SwipeScreen")
-      }
+      //if(this.props.isAuthenticated && !this.props.isNew && this.props.expiry <= Date.now()){
+      //  this.props.navigation.navigate("SwipeScreen")
+      //}
 	}
 
 	componentWillUnmount() {
+	console.log("unmounted");
 	  this.watchId !== null && navigator.geolocation.clearWatch(this.watchId);
 	}
 

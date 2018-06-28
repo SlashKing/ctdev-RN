@@ -4,6 +4,9 @@ export default {
     padding: 20,
     backgroundColor: '#fff'
   },
+  logoWrap:{
+    elevation: 10,
+  },
   logo: {
     width: 260,
     resizeMode: 'contain'

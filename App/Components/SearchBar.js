@@ -1,28 +1,37 @@
-import React, { Component } from 'react'
-import PropTypes from 'prop-types'
-import { View, Text, TextInput, TouchableOpacity } from 'react-native'
-import styles from './Styles/SearchBarStyles'
-import { Colors, Metrics } from '../Themes/'
-import Icon from 'react-native-vector-icons/FontAwesome'
+'use strict';
+
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import { View, Text, TextInput, TouchableOpacity } from 'react-native';
+import { Input, Item, Button} from 'native-base';
+import styles from './Styles/SearchBarStyles';
+import { Colors, Metrics } from '../Themes/';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 export default class SearchBar extends Component {
   static propTypes = {
     onSearch: PropTypes.func.isRequired,
     onCancel: PropTypes.func.isRequired,
-    searchTerm: PropTypes.string
+    searchTerm: PropTypes.string,
+    searching: PropTypes.bool.isRequired,
+    leftIcon: PropTypes.string,
+    rightIcon: PropTypes.string,
   }
 
+  static defaultProps = {
+    leftIcon: "search",
+    rightIcon: "trash",
+  }
   render () {
-    const { onSearch, onCancel, searchTerm } = this.props
+    const { onSearch, onCancel, searchTerm, rightIcon, leftIcon } = this.props
     const onSubmitEditing = () => onSearch(searchTerm)
     return (
-      <View style={styles.container}>
-        <Icon name='search' size={Metrics.icons.tiny} style={styles.searchIcon} />
-        <TextInput
+      <Item style={styles.container}>
+        <Icon name={leftIcon} size={Metrics.icons.tiny} style={styles.searchIcon} />
+        <Input
           ref='searchText'
-          autoFocus
           placeholder='Search'
-          placeholderTextColor={Colors.snow}
+          placeholderTextColor={Colors.charcoal}
           underlineColorAndroid='transparent'
           style={styles.searchInput}
           value={this.props.searchTerm}
@@ -34,9 +43,9 @@ export default class SearchBar extends Component {
           selectionColor={Colors.snow}
         />
         <TouchableOpacity onPress={onCancel} style={styles.cancelButton}>
-          <Text style={styles.buttonLabel}>Cancel</Text>
+          <Icon name={rightIcon} size={Metrics.icons.tiny}  style={styles.buttonLabel} />
         </TouchableOpacity>
-      </View>
+      </Item>
     )
   }
 }

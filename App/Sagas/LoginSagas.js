@@ -5,6 +5,7 @@ import ChatActions from '../Redux/ChatRedux'
 import {setAsync} from '../Lib/StorageUtils'
 import {AsyncStorage} from 'react-native'
 import { ChatAPI } from '../Services/ChatAPI'
+import {NavigationActions} from 'react-navigation'
 function * logout (api,action) {
   const token = yield isLoggedIn(null)
   const response = yield call(api.logout, token)
@@ -15,11 +16,11 @@ function * logout (api,action) {
     yield put(LoginActions.logoutSuccess())
     yield put(SwipeActions.swipeLogout())
     yield put(ChatActions.chatLogout())
-    action.navigation.dispatch({
-       type: 'Navigation/RESET',
-       index: 0,
-       actions: [{ type: 'Navigate', routeName: 'LoginScreen' }]
-    })
+    // Reset the navigation and navigate to LoginScreen
+    // IMPORTANT: key must be null in order to reset the stack
+    // TODO: Revisit to add animation when destroyed, could be cool
+    action.navigation.dispatch({type:"Navigation/RESET", index:0, key:null, actions: [{ type: 'Navigate', routeName: 'LoginScreen' }]})
+
   }else{
     yield put(LoginActions.logoutFailure(response.data))
   }
@@ -36,7 +37,7 @@ function * loginUser (api,action) {
 
     // call the api to validate the login information
    const response = yield call(api.loginUser, username, password)
-
+    console.log(response)
     // we made it!
     if (response.ok) {
       //__DEV__ && console.log(response,action)
@@ -46,6 +47,7 @@ function * loginUser (api,action) {
       yield AsyncStorage.setItem("@USER_STORE:expiry", `${response.data.token_dec.exp}`)
       yield AsyncStorage.setItem("@USER_STORE:isNew", `${response.data.is_new}`)
       yield put(LoginActions.loginSuccess(response.data))
+      console.log(ChatAPI.getStore())
       yield ChatAPI.connect(response.data.token)
       yield ChatAPI.listen(action.store)
     } else {
@@ -79,8 +81,10 @@ function * updateLocation (api, action){
   const { data } = action
   const token = yield isLoggedIn(null)
   api.setHeader("Authorization", `JWT ${token}`)
+  // update the users location
   const response = yield call(api.patchProfile, data)
   if (response.ok) {
+    // get users after the location of the user is update in the db
     yield Promise.resolve();
     const users = yield call(api.fetchUsers);
     if (users.ok){
@@ -106,7 +110,7 @@ function * patchProfile (api, action) {
   }
 }
 function * registerUser (api,action) {
-  const {username, password1, password2, email, birthday, latitude, longitudeW} = action
+  const {username, password1, password2, email, birthday, latitude, longitude} = action
     // call the api to validate the login information
    const response = yield call(api.registerUser, username, password1, password2, email, birthday, latitude, longitude)
 
@@ -143,7 +147,6 @@ console.log(action)
         ChatAPI.listen(action.store)
 
       } else {
-        // loop through possible response codes
         __DEV__ && console.log(response)
         yield put(LoginActions.checkSocialLoginError(response.data))
       }
@@ -156,7 +159,6 @@ function * passwordChange (api, action) {
         yield put(LoginActions.passwordChangeSuccess(response.data))
 
       } else {
-        // loop through possible response codes
         __DEV__ && console.log(response)
         yield put(LoginActions.passwordChangeError(response.data))
       }
@@ -165,11 +167,9 @@ function * passwordReset (api, action) {
   const response = yield call(api.passwordReset,action.data)
       if (response.ok) {
       __DEV__ && console.log(response,action)
-        //setAsync('token',response.data.token)
         yield put(LoginActions.passwordResetSuccess(response.data))
 
       } else {
-        // loop through possible response codes
         __DEV__ && console.log(response)
         yield put(LoginActions.passwordResetError(response.data))
       }
@@ -178,15 +178,46 @@ function * passwordResetConfirm (api, action) {
   const response = yield call(api.passwordResetConfirm,action.data)
       if (response.ok) {
         __DEV__ && console.log(response,action)
-        //setAsync('token',response.data.token)
         yield put(LoginActions.passwordResetConfirmSuccess(response.data))
 
       } else {
-        // loop through possible response codes
         __DEV__ && console.log(response)
         yield put(LoginActions.passwordResetConfirmError(response.data))
       }
 }
+function * addProfilePicture (api, action) {
+  const response = yield call(api.addProfilePicture, action.data)
+      if (response.ok) {
+        __DEV__ && console.log(response,action)
+        yield put(LoginActions.addProfilePictureSuccess(response.data))
+
+      } else {
+        __DEV__ && console.log(response)
+        yield put(LoginActions.addProfilePictureFailure(response.data))
+      }
+}
+function * switchPriority (api, action) {
+  const response = yield call(api.switchPriority, action.data)
+      if (response.ok) {
+        __DEV__ && console.log(response,action)
+        yield put(LoginActions.switchPrioritySuccess(response.data))
+
+      } else {
+        __DEV__ && console.log(response)
+        yield put(LoginActions.switchPriorityFailure(response.data))
+      }
+}
 export {
-  loginUser, patchUser, patchProfile, updateLocation, logout, checkSocialLogin, passwordChange, passwordReset, passwordResetConfirm, registerUser
+  loginUser,
+  patchUser,
+  patchProfile,
+  updateLocation,
+  logout,
+  checkSocialLogin,
+  passwordChange,
+  passwordReset,
+  passwordResetConfirm,
+  registerUser,
+  addProfilePicture,
+  switchPriority
 }

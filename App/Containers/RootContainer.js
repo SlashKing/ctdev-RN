@@ -10,15 +10,11 @@ import ReduxPersist from "../Config/ReduxPersist";
 import styles from "./Styles/RootContainerStyles";
 
 class RootContainer extends Component {
-  constructor(props){
-    super(props);
-  }
-  componentWillMount(){
+  constructor(props,context){
+    super(props, context);
       // pass the store to connect to chat websocket if the user is already logged in.
-			this.props.startup(this.context.store);
+			this.props.startup(props.store);
   }
-	componentDidMount() {
-	}
 
 	render() {
 		return (

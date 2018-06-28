@@ -13,6 +13,12 @@ import ModalSelector from 'react-native-modal-selector'
 import moment from 'moment'
 // Styles
 import styles from "./Styles/SettingsScreenStyles";
+const LEGAL_AGE = 19
+
+var dateObj = new Date();
+const MONTH = dateObj.getUTCMonth() + 1; //months from 1-12
+const DAY = dateObj.getUTCDate();
+const YEAR = dateObj.getUTCFullYear() - LEGAL_AGE;
 
 class SettingsScreen extends React.Component {
   constructor(props){
@@ -68,6 +74,10 @@ class SettingsScreen extends React.Component {
 		BackHandler.removeEventListener("hardwareBackPress", this._backListener)
 	  this.keyboardDidShowListener.remove();
     this.keyboardDidHideListener.remove();
+    delete dateObj;
+    delete day;
+    delete month
+    delete year;
 	}
   componentWillReceiveProps(newProps){
     if(this.props.currentUser !== newProps.currentUser){
@@ -132,9 +142,13 @@ class SettingsScreen extends React.Component {
     }
   }
   _onUsernameChanged = value => this._setState(value,"username");
+
   _onPass1Changed = value => this._setState(value,"pass1");
+
   _onPass2Changed = value => this._setState(value,"pass2");
+
   _onEmailChanged = value => this._setState(value,"email");
+
   _displayErrors=()=>{
     let {error} = this.props;
     let components = [];
@@ -266,7 +280,7 @@ class SettingsScreen extends React.Component {
                         placeholder="select date"
                         format="YYYY-MM-DD"
                         minDate="1917-05-01"
-                        maxDate= "2000-06-01"
+                        maxDate= `${YEAR}-${MONTH}-${DAY}"
                         confirmBtnText="Confirm"
                         cancelBtnText="Cancel"
                         customStyles={{
@@ -287,8 +301,6 @@ class SettingsScreen extends React.Component {
               <Label style={styles.label}> Agree to Terms </Label>
               <View>
                 <MaterialSwitch
-                  onActivate={()=>{}}
-                  onDeactivate={()=>{}}
                   onChangeState={(state) => this.setState({terms:state})}/>
               </View>
 					</Form>

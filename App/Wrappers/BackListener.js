@@ -20,7 +20,7 @@ function backListener(WrappedComponent) {
 		  BackHandler.removeEventListener("hardwareBackPress", this._backListener);
 	  };
     render(){
-      return <WrappedComponent {...this.props} {...this.state} />
+      return super.render()
     };
   };
 };

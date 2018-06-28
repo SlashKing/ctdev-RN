@@ -1,11 +1,14 @@
 import React from 'react'
-import {View, Dimensions, TouchableOpacity, Image, Orientation} from 'react-native'
+import {View, Animated, Dimensions, TouchableOpacity, Image, Orientation} from 'react-native'
 import {Card,CardItem,Thumbnail,Icon,Text,Button} from 'native-base'
-import UserProfileScreen from '../Containers/UserProfileScreen'
 import styles from './Styles/SwipeCardStyles'
 const deviceWidth = Dimensions.get('window').width
 const deviceHeight = Dimensions.get('window').height
-
+/*
+{this.props.overlays !== undefined && this.props.overlays.renderNope()}
+		            {this.props.overlays !== undefined && this.props.overlays.renderMaybe()}
+		            {this.props.overlays !== undefined && this.props.overlays.renderYup()}
+*/
 export default class SwipeCard extends React.Component {
   constructor(props) {
     super(props);
@@ -38,30 +41,28 @@ export default class SwipeCard extends React.Component {
     					  <View style={styles.cardImageWrapper}>
     						  <Image style={[styles.cardImage,{width:width - 12, flex:1, height:width - 4 }]} resizeMode={'cover'}
     						    source={{uri: this.props.profile.profile_image}} />
-    							<TouchableOpacity style={styles.goToProfile} onPress={this._goToProfile}>
+    							<TouchableOpacity activeOpacity={0.8} style={styles.goToProfile} onPress={this._goToProfile}>
     							  <Thumbnail source={{uri: this.props.profile.profile_image }} />
     							</TouchableOpacity>
     						</View>
     					  <View style={styles.info2}>
-                   <Text style={styles.usernameText}>{this.props.username}</Text>
+                   <Text style={styles.usernameText}>{`\t${this.props.username}`}</Text>
     					    <View style={styles.ageDistanceAside}>
     					  	  <Text style={styles.ageText}>{this.props.profile.age}</Text>
     					      <Text style={styles.kmText}>{`${this.props.profile.distance} km away`}</Text>
     					    </View>
     					  </View>
     						<View style={styles.info}>
-    							{this.props.likes == null ? <Text>Nothing liked on Facebook? Weird</Text> :
+    							{/* this.props.likes == null ? <Text>Nothing liked on Facebook? Weird</Text> :
                     ''
-                    /* TODO:loop through facebook likes, truncate at 3, maybe retrieve any that
+                    TODO:loop through facebook likes, truncate at 3,
                        TODO: match the current user's likes using javascript sorting function */
                   }
                    <Text style={styles.aboutText}>
                      {about}
                    </Text>
     					  </View>
-		            {this.props.overlays !== undefined && this.props.overlays.renderNope()}
-		            {this.props.overlays !== undefined && this.props.overlays.renderMaybe()}
-		            {this.props.overlays !== undefined && this.props.overlays.renderYup()}
+
     					</View>
     				</View>
     )
