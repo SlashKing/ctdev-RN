@@ -44,7 +44,7 @@ export default class MatchedModal extends Component {
 
   resetModal = () =>{
     this.setModalVis(false);
-    this.props.resetMatch();
+    this.props.resetMatch(true);
   }
 
   componentWillReceiveProps(nextProps){

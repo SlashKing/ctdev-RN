@@ -37,7 +37,7 @@ class ChatRoomScreen extends Component {
 
   onSend(messages = [],roomId,username,user) {
     const message = {...messages[0], user , content: messages[0].text};
-    this.props.sendMessage(roomId, username, message);
+    this.props.sendMessage(roomId, username, message.content);
   }
 
   isCloseToTop({ layoutMeasurement, contentOffset, contentSize }){
@@ -159,7 +159,7 @@ class ChatRoomScreen extends Component {
             </Button>
           </Left>
           <Body>
-            <Title style={{ color: 'black', fontFamily: Fonts.type.lobster}}>{ `\t${user.username}`}</Title>
+            <Title style={styles.headerTitle}>{ `\t${room.name}`}</Title>
           </Body>
           <Right>{room.active ?
             <View style={[styles.activityIndicator, styles.active]}/>:
@@ -210,7 +210,9 @@ const mapStateToProps = (state,props) => {
     currentUser: state.login.currentUser,
     fetching: state.chat.fetching,
     room: state.chat.rooms !== null ? state.chat.rooms.find(room=>room.id === props.navigation.state.params.room.id): undefined,
-    messages: state.chat.rooms !== null ? state.chat.rooms.find(room=>room.id === props.navigation.state.params.room.id).messages: undefined,
+    messages: state.chat.rooms !== null ? state.chat.rooms.find(
+      room=>room.id === props.navigation.state.params.room.id).messages
+        : undefined,
     success: state.chat.success
   }
 }

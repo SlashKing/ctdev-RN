@@ -5,10 +5,10 @@ export async function setAsync(key, value){
     await AsyncStorage.setItem(`${USER_STORE}:${key}`, `${value}`)
   } catch (error) {
     // Error saving data
-    console.log(`Error setting AsyncStorage with key: ${key}`, error)
+    __DEV__ && console.log(`Error setting AsyncStorage with key: ${key}`, error)
     return `Could not set AsyncStorage ${key} with ${value}`
   }
-    console.log('finished setAsync')
+    __DEV__ && console.log('finished setAsync')
 }
 export const getAsync = async (key) =>{
   let token = await AsyncStorage.getItem('@USER_STORE:token')

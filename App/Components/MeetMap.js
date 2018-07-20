@@ -1,10 +1,15 @@
+'use strict'
+
 import React from 'react';
 import {connect} from 'react-redux';
 import { View } from 'react-native';
 import MapView from 'react-native-maps';
-import MeetMapCallout from './MeetMapCallout';
+import MeetMapMarker from './MeetMapMarker';
 import Styles from './Styles/MeetMapStyles';
 import MeetMapCreateModal from '../Modals/MeetMapCreateModal';
+import MeetMapCurrentRoomModal from '../Modals/MeetMapCurrentRoomModal';
+import SendRequestToJoinModal from '../Modals/SendRequestToJoinModal';
+//import SendJoinRequestModal from '../Modals/SendJoinRequestModal';
 import MeetMapActions from '../Redux/MeetMapRedux';
 // Generate this MapHelpers file with `ignite generate map-utilities`
 // You must have Ramda as a dev dependency to use this.
@@ -24,19 +29,27 @@ class MeetMap extends React.Component {
     super(props)
     /* ***********************************************************
     * STEP 1
-    * Set the array of locations to be displayed on your map. You'll need to define at least
-    * a latitude and longitude as well as any additional information you wish to display.
+    * Set the array of locations to be displayed on the meet map. We add the necessities suchas
+    * latitude, longitude, their respective deltas, a picture to show on the marker, a title
+    * as well as the room TODO: why are we passing the entire room then splitting it up and adding to the top level, redundancy at its best
     *************************************************************/
-    var locations = []
-    props.groupRooms.forEach((r,index)=> locations.push({
-        room: {...r},
+    let locations = []
+
+    props.groupRooms.forEach((r,index)=> {
+      const numUsers = r.users.length;
+      const adminUser = r.users.find(u=>u.admin);
+      locations.push({
+        room: r,
         id: r.id,
         title: r.name,
-        picture: r.users[0].profile.profile_image,
+        picture: r.users.length > 0 && adminUser !== undefined ? adminUser.profile.profile_image : '',
         users: r.users,
         latitude: r.location.latitude,
-        longitude: r.location.longitude
+        longitude: r.location.longitude,
+        latitudeDelta: 0.1,
+        longitudeDelta: 0.1
       })
+      }
     )
     /* ***********************************************************
     * STEP 2
@@ -67,18 +80,26 @@ class MeetMap extends React.Component {
     // this.setState({
     //   region: calculateRegion(newProps.locations, { latPadding: 0.1, longPadding: 0.1 })
     // })
+
+    /* *******
+     * When a new group is added to the groupRooms prop through ws or from group creation, we add to the map
+    *********/
+
     if ( newProps.groupRooms.length > this.props.groupRooms.length){
+      const room = newProps.groupRooms[newProps.groupRooms.length-1];
       this.setState({
-        locations: this.state.locations.map((r,index)=> locations.push({
-          room: {...r},
-          id: r.id,
-          title: r.name,
-          picture: r.users[0].profile.profile_image,
-          users: r.users,
-          latitude: r.location.latitude,
-          longitude: r.location.longitude
-        }))
-      })
+        locations: this.state.locations.concat({
+          room,
+          id: room.id,
+          title: room.name,
+          picture: room.users[0].profile.profile_image,
+          users: room.users,
+          latitude: room.location.latitude,
+          longitude: room.location.longitude,
+          latitudeDelta: 0.1,
+          longitudeDelta: 0.1
+        })
+      });
     }
     console.log(newProps);
   }
@@ -99,13 +120,14 @@ class MeetMap extends React.Component {
     console.log(newRegion)
   }
 
-  calloutPress = (location) => {
+  calloutPress (location) {
     /* ***********************************************************
     * STEP 5
     * Configure what will happen (if anything) when the user
     * presses your callout.
     *************************************************************/
-    console.log(location.room)
+    console.log(location)
+    this.setState({ region : location})
     this.props.setCurrentRoom(location.room);
   }
 
@@ -115,58 +137,127 @@ class MeetMap extends React.Component {
     * Customize the appearance and location of the map marker.
     * Customize the callout in ./MeetMapCallout.js
     *************************************************************/
-    console.log(location)
     return (
-      <MapView.Marker
-        key={location.title}
-        image={{ uri: location.picture }}
-        coordinate={{
-          latitude: location.latitude,
-          longitude: location.longitude
-        }}>
-        <MeetMapCallout
+      <MeetMapMarker
+          key={`marker_${location.id}`}
           location={location}
-          users={location.users}
-          onPress={this.calloutPress} />
-      </MapView.Marker>
+          onCalloutPress={()=>this.calloutPress(location)}
+      />
     )
   }
 
-  goToRoom = () => this.props.navigation.navigate("MeetMapChatRoomScreen", {room: this.props.createdRoom});
-  goToGroupChat = () => this.props.navigation.navigate("MeetMapChatScreen", {});
+  goToRoom = () => {
+    this.modalRef.resetModal();
+    this.props.navigation.navigate("MeetMeChatRoomScreen", {room: this.props.createdRoom});
+  }
 
-  onPress = (e) => {
-    this.setState({region: {...e.nativeEvent.coordinate, latitudeDelta:0, longitudeDelta:0}})
+  goToGroupChat = () => {
+    this.props.navigation.navigate("MeetMeChatScreen", {});
+  }
 
+  goToCurrentRoom = () => {
+    this.props.navigation.navigate("MeetMeChatRoomScreen", {room: this.props.currentRoom});
+    this.modalRef.resetModal();
+  }
+
+  goToCurrentRequestToJoinRoom = () => {
+    this.props.navigation.navigate("MeetMeChatRoomScreen", {room: this.props.currentRequestToJoin});
+    this.modalRef.resetModal();
+  }
+
+  onLongPress = (e) => {
+    this.setState({region: {...e.nativeEvent.coordinate, latitudeDelta:0.1, longitudeDelta:0.1}})
     console.log(e.nativeEvent, this.state.region);
   }
+
   onPoiClick = e => {
     this.setState({isPoi: true})
     console.log(e.nativeEvent)
   }
 
+  _renderModal(){
+    const {
+      currentUser, currentRoom, createdRoom, currentRequestToJoin, currentJoinRequest, fetchChatUsers, currentRequestableUsers,
+      resetCurrentRoom, setCurrentRoom, resetMeetMapSuccess, resetCurrentJoinRequest, resetCurrentRequestToJoin,
+      createMeetMapRoom, setCurrentRequestToJoin, setCurrentJoinRequest, requestToJoin, sendJoinRequest,
+      cancelJoinRequest, acceptJoinRequest, rejectJoinRequest, success
+    } = this.props;
+    const { isPoi, region } = this.state;
+    let modal = null;
+    if (currentRoom !== null) {
+      modal = <MeetMapCurrentRoomModal
+                ref={ el =>this.modalRef = el }
+                currentRoom={currentRoom}
+                fetchChatUsers={fetchChatUsers}
+                setCurrentRequestToJoin={setCurrentRequestToJoin}
+                setCurrentJoinRequest={setCurrentJoinRequest}
+                resetCurrentRoom={resetCurrentRoom}
+                goToRoom={this.goToCurrentRoom}
+                resetSuccess={resetMeetMapSuccess}
+                success={success}
+              />
+    }else if(currentRequestToJoin !== null){
+      modal = <SendRequestToJoinModal
+                ref={ el =>this.modalRef = el }
+                goToRoom={this.goToCurrentRequestToJoinRoom}
+                fetchChatUsers={fetchChatUsers}
+                currentUser={currentUser.id}
+                currentRequestToJoin={currentRequestToJoin}
+                currentRequestableUsers={currentRequestableUsers}
+                sendRequestToJoin={requestToJoin}
+                cancelJoinRequest={cancelJoinRequest}
+                acceptJoinRequest={acceptJoinRequest}
+                rejectJoinRequest={rejectJoinRequest}
+                resetCurrentRequestToJoin={resetCurrentRequestToJoin}
+                resetSuccess={resetMeetMapSuccess}
+                success={success}
+              />
+    }else if(currentJoinRequest !== null){
+    /*
+      modal = <SendJoinRequestModal
+                ref={ el =>this.modalRef = el }
+                goToRoom={this.goToCurrentRequestToJoinRoom}
+                currentJoinRequest={currentJoinRequest}
+                resetCurrentJoinRequest={resetCurrentJoinRequest}
+                resetSuccess={resetSuccess}
+                success={success}
+              />
+    */
+    }else{
+      modal = <MeetMapCreateModal
+                  ref={ el =>this.modalRef = el }
+                  createRoom={createMeetMapRoom}
+                  fetchChatUsers={fetchChatUsers}
+                  goToRoom={this.goToRoom}
+                  setCurrentRoom={setCurrentRoom}
+                  currentRequestableUsers={currentRequestableUsers}
+                  createdRoom={createdRoom}
+                  currentLocation={region}
+                  resetSuccess={resetMeetMapSuccess}
+                  success={success}
+                  isPoi={isPoi}
+              />
+    }
+    return modal;
+  }
   render () {
+    const { currentRoom } = this.props;
+    const { locations, region, showUserLocation } = this.state;
+
     return (
       <View style={[Styles.container]}>
         <MapView
           style={Styles.map}
-          initialRegion={this.state.region}
+          initialRegion={region}
           onRegionChangeComplete={this.onRegionChange}
-          showsUserLocation={this.state.showUserLocation}
-          onLongPress={this.onPress}
-          onPress={this.onPress}
-          onPoiClick={this.onPress}
+          showsUserLocation={showUserLocation}
+          onLongPress={this.onLongPress}
+          //onPress={this.onLongPress}
+          onPoiClick={this.onLongPress}
         >
-          {this.state.locations.map((location) => this.renderMapMarkers(location))}
+          {locations.map((location) => this.renderMapMarkers(location))}
         </MapView>
-        <MeetMapCreateModal
-          createRoom={this.props.createMeetMapRoom}
-          goToRoom={this.goToRoom}
-          createdRoom={this.props.createdRoom}
-          currentRoom={this.props.currentRoom}
-          currentLocation={this.state.region}
-          isPoi={this.state.isPoi}
-        />
+        { this._renderModal() }
        <View style={Styles.mapDrawerOverlay} />
      </View>
     )
@@ -174,9 +265,13 @@ class MeetMap extends React.Component {
 }
 const mapStateToProps= (state) =>{
   return{
+    currentUser: state.login.currentUser,
     latitude: state.login.currentUser.profile.location.latitude,
     longitude: state.login.currentUser.profile.location.longitude,
     groupRooms: state.meet_map.group_rooms,
+    currentRequestableUsers: state.meet_map.currentRequestableUsers,
+    currentJoinRequest: state.meet_map.currentJoinRequest,
+    currentRequestToJoin: state.meet_map.currentRequestToJoin,
     currentRoom: state.meet_map.currentRoom,
     createdRoom: state.meet_map.createdRoom,
     success: state.meet_map.success,
@@ -186,17 +281,25 @@ const mapStateToProps= (state) =>{
 }
 const mapDispatchToProps= (dispatch) =>{
   return{
+      fetchChatUsers: (room) => dispatch(MeetMapActions.fetchBareBoneChatUsers({room})),
       setCurrentRoom: (room) => dispatch(MeetMapActions.setCurrentMeetMapRoom({room})),
+      setCurrentJoinRequest: (room) => dispatch(MeetMapActions.setCurrentJoinRequest({room})),
+      setCurrentRequestToJoin: (room) => dispatch(MeetMapActions.setCurrentRequestToJoin({room})),
       resetMeetMapSuccess: () => dispatch(MeetMapActions.resetMeetMapSuccess()),
-      requestToJoin: (roomId) => dispatch(MeetMapActions.requestToJoin({ roomId })),
-      rejectJoinRequest: (roomId) => dispatch (MeetMapActions.rejectJoinRequest({roomId})),
-      acceptJoinRequest: (roomId, message) => dispatch (MeetMapActions.rejectJoinRequest({ roomId, message })),
-      createMeetMapRoom: (title, currentLocation, users) => dispatch(MeetMapActions.createMeetMapRoom({
+      resetCurrentJoinRequest: () => dispatch(MeetMapActions.resetCurrentJoinRequest()),
+      resetCurrentRequestToJoin: () => dispatch(MeetMapActions.resetCurrentRequestToJoin()),
+      requestToJoin: (roomId, admin, message, sendToUsers) => dispatch(MeetMapActions.requestToJoin({ roomId, admin, message, sendToUsers })),
+      cancelJoinRequest: (roomId, jrId) => dispatch(MeetMapActions.cancelJoinRequest(roomId, jrId)),
+      rejectJoinRequest: (roomId, jrId) => dispatch(MeetMapActions.rejectJoinRequest(roomId, jrId )),
+      acceptJoinRequest: (roomId, jrId) => dispatch (MeetMapActions.acceptJoinRequest(roomId, jrId )),
+      createMeetMapRoom: (title, currentLocation, users, privacy) => dispatch(MeetMapActions.createMeetMapRoom({
           title,
           location: {latitude: currentLocation.latitude, longitude: currentLocation.longitude},
-          users
+          users,
+          private: privacy,
         })
-      )
+      ),
+      resetCurrentRoom: () => dispatch(MeetMapActions.resetMeetMapCurrentRoom()),
       // updateLocation: (currentUserId, lat, lon) =>dispatch(LoginActions.updateLocation(currentUserId, lat, lon),
     }
 

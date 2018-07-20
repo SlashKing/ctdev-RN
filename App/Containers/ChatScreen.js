@@ -2,7 +2,7 @@
 
 import React, { Component } from 'react';
 import { Alert, View, FlatList, BackHandler, Text, TouchableOpacity, } from 'react-native';
-import { ListItem, Thumbnail, List,Content, Card, CardItem, Container, Header, Left, Right, Body, Button, Title, Icon, Footer, FooterTab } from 'native-base';
+import { ListItem, Thumbnail, List,Content, Card, CardItem, Badge, Container, Header, Left, Right, Body, Button, Title, Icon, Footer, FooterTab } from 'native-base';
 import { connect } from 'react-redux';
 import ModalDropdown from 'react-native-modal-dropdown';
 import AppConfig from '../Config/AppConfig';
@@ -14,6 +14,7 @@ import I18n from '../I18n';
 import UserReportModal from '../Modals/UserReportModal';
 
 import styles from './Styles/ChatScreenStyle';
+import { Colors } from '../Themes';
 
 class ChatScreen extends Component {
   constructor(props){
@@ -52,31 +53,46 @@ class ChatScreen extends Component {
     return blocked ? I18n.t('unblock') : I18n.t('block');
   }
 
+  _handleRoomNavigationClick(item){
+    this.props.markRoomMessageNotificationsRead(item.id)
+    this.props.navigation.navigate("ChatRoomScreen", {room: {...item}})
+  }
+
+  _handleProfileNavigationClick(user){
+    this.props.navigation.navigate("UserProfileScreen",{...user})
+  }
+
   _renderItem = ({ item }) => {
       const user = item.users[0];
       const p_image = user.profile.profile_image;
       const options = [this._blockedText(user.blocked), I18n.t('report'), I18n.t('unmatch')];
       return (
 
-        <Card style={styles.card}>
-          <CardItem style={{}}>
-        		<TouchableOpacity onPress={()=>this.props.navigation.navigate("UserProfileScreen",{...user})}
+        <Card style={[styles.card, {backgroundColor: user.blocked ? Colors.lowSalmon : Colors.snow}]}>
+          <CardItem style={styles.item}>
+        		<TouchableOpacity onPress={()=>this._handleProfileNavigationClick(user)}
         		  style={{alignItems:'center', elevation:10,height:45, width:45, borderRadius:22.5}}>
         		  <Thumbnail style={{height:45,width:45}} source={{ uri: p_image }} />
         		</TouchableOpacity>
+        		{ item.notifications_count > 0 &&
+                <Badge
+                  success>
+                  <Text>{item.notifications_count}</Text>
+                </Badge>
+            }
         	</CardItem>
-        	<CardItem>
-        		<Button onPress={()=>this.props.navigation.navigate("ChatRoomScreen", {room: {...item}})} transparent>
+        	<CardItem style={styles.item}>
+        		<Button onPress={()=>this._handleRoomNavigationClick(item)} transparent>
         			<Text style={styles.usernameText}>{`\t${user.username}`}</Text>
         		</Button>
         	</CardItem>
         	{item.isTyping ?
-            <CardItem >
+            <CardItem style={styles.item}>
               <RippleLoader size={20}/>
             </CardItem> : undefined
           }
           <Right>
-            <CardItem>
+            <CardItem style={styles.item}>
               <ModalDropdown dropdownStyle={{width:180}} options={options} onSelect={(idx, value) => this._onDropdownSelect(idx, value, user, item.id)}>
                 <Icon name="cog" />
               </ModalDropdown>
@@ -135,15 +151,16 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    unblockUser: (roomId, userId) => dispatch(ChatActions.unblockUser({ roomId, userId })),
-    blockUser: (roomId, userId) => dispatch(ChatActions.blockUser({ roomId, userId })),
-    unmatchUser: (roomId, userId) => dispatch(ChatActions.unmatchUser({ roomId, userId })),
+    unblockUser: (roomId, userId) => dispatch(ChatActions.unblockUser( roomId, userId )),
+    blockUser: (roomId, userId) => dispatch(ChatActions.blockUser( roomId, userId )),
+    unmatchUser: (roomId, userId) => dispatch(ChatActions.unmatchUser( roomId, userId )),
     reportUser: (userId, report_type, comment) => dispatch(
       ChatActions.reportUser({
         userId,
         report_type,
         comment
       })),
+    markRoomMessageNotificationsRead: (roomId) => dispatch(ChatActions.markRoomMessageNotificationsRead(roomId)),
     resetReport: () => dispatch(ChatActions.reportUserSuccess({success: null})),
     search:(searchTerm) => dispatch(ChatActions.searchRooms(searchTerm)),
     cancelSearch:()=> dispatch(ChatActions.cancelRoomsSearch())

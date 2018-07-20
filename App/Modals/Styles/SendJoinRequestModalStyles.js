@@ -9,24 +9,23 @@ export default StyleSheet.create({
     alignItems:'center',
   },
   innerStyle:{
-    flex:1,
-    justifyContent:'center',
-    alignItems: 'center'
+    flexGrow:1,
   },
   textarea:{
-    width:Dimensions.get('window').width,
-    padding: 10,
-    backgroundColor: Colors.snow
+    width: Dimensions.get('window').width-20,
+    backgroundColor: 'white',
+    borderRadius:5,
   },
-  usernameText: {paddingLeft: 4 , color: Colors.steel, fontFamily: Fonts.type.lobster,},
+  usernameText: {...Fonts.style.h2, color: Colors.snow, paddingLeft: 4 },
   avatar:{
     height:150,
     width: 150,
     borderRadius:75,
-    elevation:7
   },
+
   wrapper:{
     flex:1,
+    paddingTop:60,
     justifyContent: 'center',
     alignItems: 'center'
   },
@@ -40,10 +39,6 @@ export default StyleSheet.create({
     flexDirection:'row',
     justifyContent: 'center'
   },
-  danger:{
-    backgroundColor: Colors.indian,
-    borderColor: Colors.coal,
-  },
   button:{
     flex:1,
     flexDirection:'column',
@@ -51,18 +46,26 @@ export default StyleSheet.create({
     borderBottomWidth:0.3,
     borderRightWidth: 0,
     borderRightWidth:0.3,
+    borderColor: Colors.coal,
     borderRadius:0,
     backgroundColor: Colors.steel,
-    borderColor: Colors.coal,
     justifyContent:'center',
     alignItems:'center'
   },
+  editButton:{
+    ...StyleSheet.absoluteFillObject,
+    top:0,
+    width:Dimensions.get('window').width,
+    height: 60,
+    backgroundColor:'red',
+    borderBottomWidth:0.3,
+    borderColor: Colors.coal,
+    borderRadius:0,
+    backgroundColor: Colors.steel,
+    alignItems: 'center'
+  },
   buttonRight:{
     borderLeftWidth:0,
-  },
-  success:{
-    backgroundColor: Colors.loGreen,
-    borderColor: Colors.coal,
   },
   buttonText:{
     color: Colors.coal,
@@ -71,6 +74,12 @@ export default StyleSheet.create({
   },
   matchText: {
     color: 'white',
-    ...Fonts.style.h1
+    ...Fonts.style.h1,
+    textAlign: 'center'
   },
+  textWithLabelWrap:{
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center'
+  }
 })

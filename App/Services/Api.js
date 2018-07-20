@@ -31,6 +31,7 @@ const create = (baseURL = 'http://192.168.0.13:8000/') => {
 
   // Users
   const fetchUsers = () => api.get('api/users/',{limit: 5})
+
   // TODO: add a custom request that will implement algorithm to choose most likely matches based on matching facebook interests/likes
   // TODO: will save the aforementioned list to an index for more efficient retrieval and less strain on database requests.
   const fetchCurrentUser = () => api.get('api/users/i/',{})
@@ -52,7 +53,10 @@ const create = (baseURL = 'http://192.168.0.13:8000/') => {
   const fetchNotifications = (user) => api.get(`api/notifications/${user}/`, {})
 
   // Chat
-  const unmatchUser = (user) => api.post(`api/likes/${user}/unmatch`,{})
+  const unmatchUser = (user) => api.post(`api/likes/${user}/unmatch/`,{})
+  const markAllRoomNotificationsRead = (roomId) => api.post(`api/rooms/${roomId}/mark_notifications_read/`)
+  const markAllGroupRoomNotificationsRead = (roomId) => api.post(`api/g_rooms/${roomId}/mark_notifications_read/`)
+  const fetchBareBoneChatUsers = (data) => api.get(`api/groupchatusers/?r_id=${data.room}`,{})
   const fetchRooms = (user) => api.get(`api/rooms/${user}`,{})
   const createFileMessage = (data) => api.post('api/messages/',{...data})
   const flagMessage = (data) => api.post(`api/messages/${data.id}/add_flag/`,{reason:data.reason, comment: data.comment})
@@ -104,6 +108,9 @@ const create = (baseURL = 'http://192.168.0.13:8000/') => {
     removeMessageFlag,
     reportUser,
     fetchNotifications,
+    fetchBareBoneChatUsers,
+    markAllRoomNotificationsRead,
+    markAllGroupRoomNotificationsRead,
     checkSocialLogin,
     logout,
     loginUser,

@@ -3,6 +3,14 @@ import {ChatAPI} from '../Services/ChatAPI';
 import ChatActions from '../Redux/ChatRedux';
 import _ from 'lodash';
 
+
+/* #############################################################
+ *
+ *                         flagMessage
+ *
+ *
+ *
+ * ############################################################# */
 export function * flagMessage(api, action){
   const { data } = action
   const response = yield call(api.flagMessage, data)
@@ -13,6 +21,14 @@ export function * flagMessage(api, action){
   }
 }
 
+
+/* #############################################################
+ *
+ *                      removeMessageFlag
+ *
+ *
+ *
+ * ############################################################# */
 export function * removeMessageFlag(api, action){
   const { data } = action
   const response = yield call(api.removeMessageFlag, data)
@@ -23,6 +39,14 @@ export function * removeMessageFlag(api, action){
   }
 }
 
+
+/* #############################################################
+ *
+ *                        reportUser
+ *
+ *
+ *
+ * ############################################################# */
 export function * reportUser(api, action){
   const { data } = action
   const response = yield call(api.reportUser, data)
@@ -33,18 +57,50 @@ export function * reportUser(api, action){
   }
 }
 
+
+/* #############################################################
+ *
+ *                      setEndOfRoomResults
+ *
+ *
+ *
+ * ############################################################# */
 export function * setEndOfRoomResults(action) {
 	 yield put(ChatActions.setEndofRoomResults(action.roomId, action.end))
 }
 
+
+/* #############################################################
+ *
+ *                        loadingMessages
+ *
+ *
+ *
+ * ############################################################# */
 export function * loadingMessages(loading) {
 		 yield put(ChatActions.setFetching(action.fetching))
 }
 
+
+/* #############################################################
+ *
+ *                          loginUser
+ *
+ *
+ *
+ * ############################################################# */
 export function * loginUser (action){
   ChatAPI.send({type:"CHAT_LOGIN", user: action.username})
 }
 
+
+/* #############################################################
+ *
+ *                        setRoomIsTyping
+ *
+ *
+ *
+ * ############################################################# */
 export function * setRoomIsTyping(action){
   ChatAPI.send({
     type:"SET_ROOM_IS_TYPING",
@@ -53,6 +109,14 @@ export function * setRoomIsTyping(action){
   })
 }
 
+
+/* #############################################################
+ *
+ *                  requestPriorMessages
+ *
+ *
+ *
+ * ############################################################# */
 export function * requestPriorMessages(action) {
   const firstMessage = _.minBy(action.messages, (m) => m.id);
   ChatAPI.send({
@@ -63,19 +127,35 @@ export function * requestPriorMessages(action) {
   });
 }
 
+
+/* #############################################################
+ *
+ *                      unmatchUser
+ *
+ *
+ *
+ * ############################################################# */
 export function * unmatchUser(api, action){
-  const { data } = action
-  const response = yield call(api.unmatchUser, data.userId)
+  const { userId } = action
+  const response = yield call(api.unmatchUser, userId)
   if(response.ok){
     ChatAPI.send({
-      type: "DELETE_CHAT_ROOM",
-      roomId: data.roomId,
+      ...action,
+      type: "DELETE_CHAT_ROOM"
     })
   }else{
     yield put(ChatActions.deleteChatRoomFailure(response.data))
   }
 }
 
+
+/* #############################################################
+ *
+ *                      sendMessage
+ *
+ *
+ *
+ * ############################################################# */
 export function * sendMessage(api, action){
   const { data } = action
   // make the call to the api
@@ -94,6 +174,14 @@ export function * sendMessage(api, action){
   }
 }
 
+
+/* #############################################################
+ *
+ *                      createRoom
+ *
+ *
+ *
+ * ############################################################# */
 export function * createRoom(action) {
   ChatAPI.send({
     type: "CREATE_CHAT_ROOM",
@@ -101,6 +189,36 @@ export function * createRoom(action) {
   })
 }
 
+
+/* #############################################################
+ *
+ *                markRoomMessageNotificationsRead
+ *
+ *
+ *
+ * ############################################################# */
+export function * markRoomMessageNotificationsRead (api, action) {
+  const { roomId } = action
+  console.log(action)
+  // make the call to the api
+  const response = yield call(api.markAllRoomNotificationsRead, roomId)
+
+  // success?
+  if (response.ok) {
+    yield put(ChatActions.markRoomMessageNotificationsReadSuccess(response.data))
+  } else {
+    yield put(ChatActions.markRoomMessageNotificationsReadFailure(response.data))
+  }
+}
+
+
+/* #############################################################
+ *
+ *                fetchRooms
+ *
+ *
+ *
+ * ############################################################# */
 export function * fetchRooms (api, action) {
   const { data } = action
   // make the call to the api
@@ -110,6 +228,6 @@ export function * fetchRooms (api, action) {
   if (response.ok) {
     yield put(ChatActions.fetchRoomsSuccess(response.data))
   } else {
-    yield put(ChatActions.fetchRoomsFailure())
+    yield put(ChatActions.fetchRoomsFailure(response.data))
   }
 }

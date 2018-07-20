@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Animated, View, FlatList, TouchableOpacity} from 'react-native';
+import {Animated, Image, View, Text, FlatList, TouchableOpacity} from 'react-native';
+import { Thumbnail } from 'native-base';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import GENDER_CHOICES from '../Config/SettingsConfig'
 
@@ -12,9 +13,12 @@ export default class MultiSelect extends React.Component{
     isMulti: true,
     isTF: false,
     selected: [],
+    numColumns: 2,
+    horizontal: false,
     choices: GENDER_CHOICES.GENDER_CHOICES,
     onItemSelected: (array) => null,
-    alertMessage: null
+    alertMessage: null,
+    noMoreView: ()=><Text>No choices available</Text>
   }
 
   constructor(props){
@@ -31,6 +35,23 @@ export default class MultiSelect extends React.Component{
       this.selectedData = props.selected
   }
 
+  componentWillReceiveProps(nextProps){
+  console.log(this.props,nextProps)
+    if(this.props.choices.length !== nextProps.choices.length){
+      this.setState({
+        selected: nextProps.choices.map(
+         item=>this.props.isMulti ?
+           this.props.selected.some(item2=>item2 === item.key) ?
+             { ...item, selected:true} : { ...item, selected:false } :
+           item.key === this.props.selected ? // when true/false, 0 false, 1 true
+             { ...item, selected:true} : { ...item, selected:false }
+        )
+      })
+    }
+  }
+  resetSelected(){
+    this.selectedData=this.selectedData.splice(0,this.selectedData.length);
+  }
   _setSelected(item){
     const { isMulti, isTF } = this.props;
     if (isTF) { this.selectedData = !item.selected}
@@ -55,15 +76,19 @@ export default class MultiSelect extends React.Component{
   }
 
    renderItem=({item, separators})=>{
+    console.log(item)
+      const containerStyle = item.profile_image ? styles.container : [styles.container, {flex:1}];
       const view = (
         <TouchableOpacity
-          delayLongPress={600}
+          delayLongPress={100}
           onLongPress={()=>this._setSelected(item)}
-          style={styles.container}>
+          style={containerStyle}>
 
-        <Icon name={item.icon}
-          style={styles.icon}
-        />
+        { item.profile_image === undefined && <Icon name={item.icon} style={styles.icon} /> }
+
+        {item.profile_image && <Image style={styles.image} resizeMethod="resize" source={{uri:item.profile_image}} />
+        }
+        {item.username && <Text style={{flex:1}}>{item.username.substring(0,7)}</Text>}
         {item.selected && <View style={styles.overlay} pointerEvents='none' />}
         </TouchableOpacity>
       );
@@ -74,21 +99,23 @@ export default class MultiSelect extends React.Component{
   _keyExtractor=(item, idx)=> `gender_choice_${idx}`
 
   render(){
-    return(
-      <View style={{flex:1}}>
-        <FlatList
-          columnWrapperStyle={{ justifyContent:'space-around' }}
+  console.log(this.state.selected)
+    return this.props.choices.length > 0 ? (
+      <View style={{flexGrow:1}}>
+        <FlatList removeClippedSubviews={true} scrollEventThrottle={16}
+          columnWrapperStyle={{ flexGrow:1, justifyContent:'center',alignItems:'center' }}
           contentContainerStyle={{
-            flexShrink:0,
+            //flexGrow:1,
             justifyContent: 'center',
-            padding: 10}}
+            padding: 10
+          }}
           data={this.state.selected}
-          horizontal={false}
-          numColumns={2}
+          horizontal={this.props.horizontal}
+          numColumns={this.props.numColumns}
           renderItem={this.renderItem}
           keyExtractor={this._keyExtractor}
         />
       </View>
-    )
+    ) : <View style={{ flex: 1 }}>{this.props.noMoreView()}</View>
   }
 }

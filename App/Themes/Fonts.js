@@ -32,6 +32,8 @@ const size = {
 
 const style = {
   h1: {
+    paddingTop:15,
+    paddingBottom:7,
     fontFamily: type.lobster,
     fontSize: size.h1
   },

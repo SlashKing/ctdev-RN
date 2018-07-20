@@ -10,39 +10,25 @@ export default StyleSheet.create({
   },
   innerStyle:{
     flex:1,
-    justifyContent:'center',
-    alignItems: 'center'
   },
   textarea:{
-    width:Dimensions.get('window').width,
-    padding: 10,
-    backgroundColor: Colors.snow
+    backgroundColor: 'white'
   },
-  usernameText: {paddingLeft: 4 , color: Colors.steel, fontFamily: Fonts.type.lobster,},
+  usernameText: {paddingLeft: 4 , fontFamily: Fonts.type.lobster,},
   avatar:{
     height:150,
     width: 150,
     borderRadius:75,
-    elevation:7
   },
   wrapper:{
     flex:1,
+    paddingTop:60,
     justifyContent: 'center',
     alignItems: 'center'
   },
   buttonRow:{
-    position:'absolute',
-    left:0,
-    bottom:0,
-    margin:0,
-    padding:0,
-    flex:1,
     flexDirection:'row',
-    justifyContent: 'center'
-  },
-  danger:{
-    backgroundColor: Colors.indian,
-    borderColor: Colors.coal,
+    justifyContent: 'space-around'
   },
   button:{
     flex:1,
@@ -51,18 +37,26 @@ export default StyleSheet.create({
     borderBottomWidth:0.3,
     borderRightWidth: 0,
     borderRightWidth:0.3,
+    borderColor: Colors.coal,
     borderRadius:0,
     backgroundColor: Colors.steel,
-    borderColor: Colors.coal,
     justifyContent:'center',
     alignItems:'center'
   },
+  editButton:{
+    ...StyleSheet.absoluteFillObject,
+    top:0,
+    width:Dimensions.get('window').width,
+    height: 60,
+    backgroundColor:'red',
+    borderBottomWidth:0.3,
+    borderColor: Colors.coal,
+    borderRadius:0,
+    backgroundColor: Colors.steel,
+    alignItems: 'center'
+  },
   buttonRight:{
     borderLeftWidth:0,
-  },
-  success:{
-    backgroundColor: Colors.loGreen,
-    borderColor: Colors.coal,
   },
   buttonText:{
     color: Colors.coal,

@@ -23,4 +23,9 @@ export default StyleSheet.create({
     height: Dimensions.get('window').height,
     width: 20,
   },
+  marker: {
+    width:30,
+    height:30,
+    elevation:4
+  }
 })

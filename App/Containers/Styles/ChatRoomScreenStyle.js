@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native'
-import { ApplicationStyles, Colors } from '../../Themes/'
+import { ApplicationStyles, Colors, Fonts } from '../../Themes/'
 
 export default StyleSheet.create({
   ...ApplicationStyles.screen,
@@ -15,6 +15,7 @@ export default StyleSheet.create({
   camAccessoryIcon:{
     paddingHorizontal: 7,
   },
+  headerTitle: { color: 'black', fontFamily: Fonts.type.lobster},
   activityIndicator:{
     elevation:5,
     width: 16,

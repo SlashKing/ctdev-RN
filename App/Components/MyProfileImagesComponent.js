@@ -1,6 +1,6 @@
 import React, {Component}  from 'react'
 import PropTypes from 'prop-types'
-import { Image, Text, BackHandler, Dimensions, ScrollView, Animated, TouchableOpacity, FlatList } from "react-native";
+import { Image, Text, BackHandler, Dimensions, ScrollView, Animated, TouchableOpacity } from "react-native";
 import { View } from 'native-base'
 import styles from './Styles/ProfileImagesComponentStyles'
 
@@ -31,12 +31,6 @@ export default class MyProfileImagesComponent extends Component{
     }
     this.animVal = new Animated.Value(0)
   }
-	componentDidMount() {
-		BackHandler.addEventListener("hardwareBackPress", () => {
-			//this.props.navigation.goBack();
-			return true;
-		});
-	}
 	renderFooter = () => {
      if (this.props.images.length != 0) return null;
      return (

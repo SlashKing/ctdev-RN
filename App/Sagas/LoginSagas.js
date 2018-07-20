@@ -44,7 +44,7 @@ function * loginUser (api,action) {
       // save the token to AsyncStorage so we can append to Authorization header
       // save user object in redux to use across the entire application
       yield AsyncStorage.setItem("@USER_STORE:token", response.data.token)
-      yield AsyncStorage.setItem("@USER_STORE:expiry", `${response.data.token_dec.exp}`)
+      yield AsyncStorage.setItem("@USER_STORE:expiry", `${response.data.expiry}`)
       yield AsyncStorage.setItem("@USER_STORE:isNew", `${response.data.is_new}`)
       yield put(LoginActions.loginSuccess(response.data))
       console.log(ChatAPI.getStore())
@@ -64,7 +64,7 @@ function * patchUser (api, action) {
   if (response.ok) {
     console.log(response)
     yield AsyncStorage.setItem("@USER_STORE:token", response.data.token)
-    yield AsyncStorage.setItem("@USER_STORE:expiry", `${response.data.token_dec.exp}`)
+    yield AsyncStorage.setItem("@USER_STORE:expiry", `${response.data.expiry}`)
     yield AsyncStorage.setItem("@USER_STORE:isNew", `${response.data.is_new}`)
     yield put(LoginActions.patchUserSuccess(response.data))
     yield Promise.resolve()
@@ -102,7 +102,7 @@ function * patchProfile (api, action) {
   const response = yield call(api.patchProfile, data)
   if (response.ok) {
     yield AsyncStorage.setItem("@USER_STORE:token", response.data.token)
-    yield AsyncStorage.setItem("@USER_STORE:expiry", `${response.data.token_dec.exp}`)
+    yield AsyncStorage.setItem("@USER_STORE:expiry", `${response.data.expiry}`)
     yield AsyncStorage.setItem("@USER_STORE:isNew", `${response.data.is_new}`)
     yield put(LoginActions.patchProfileSuccess(response.data))
   }else{
@@ -120,7 +120,7 @@ function * registerUser (api,action) {
       // save the token somewhere safe so we can append to Authorization header
       // save user object in redux to use across the entire application
       yield AsyncStorage.setItem("@USER_STORE:token", response.data.token)
-      yield AsyncStorage.setItem("@USER_STORE:expiry", `${response.data.token_dec.exp}`)
+      yield AsyncStorage.setItem("@USER_STORE:expiry", `${response.data.expiry}`)
       yield AsyncStorage.setItem("@USER_STORE:isNew", `${response.data.is_new}`)
       yield put(LoginActions.registerSuccess(response.data))
         ChatAPI.connect(response.data.token)
@@ -139,7 +139,7 @@ console.log(action)
         // save the token somewhere safe so we can append to Authorization header
         // save user object in redux to use across the entire application
         yield AsyncStorage.setItem("@USER_STORE:token", response.data.token)
-        yield AsyncStorage.setItem("@USER_STORE:expiry", `${response.data.token_dec.exp}`)
+        yield AsyncStorage.setItem("@USER_STORE:expiry", `${response.data.expiry}`)
         yield AsyncStorage.setItem("@USER_STORE:isNew", `${response.data.is_new}`)
         yield put(LoginActions.checkSocialLoginSuccess(response.data))
         //ChatAPI.close()

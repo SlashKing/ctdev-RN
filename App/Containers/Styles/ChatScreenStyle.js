@@ -4,12 +4,13 @@ import { ApplicationStyles, Fonts, Colors } from '../../Themes/'
 export default StyleSheet.create({
   ...ApplicationStyles.screen,
   card:{
-    flex: 0,
+    flex: 1,
     padding: 0,
     flexDirection:'row',
     marginBottom:3,
     marginTop:0,
   },
+  item:{ backgroundColor:'transparent'},
   header:{
     backgroundColor: Colors.steel
   },

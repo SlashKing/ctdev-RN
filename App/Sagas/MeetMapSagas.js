@@ -28,3 +28,29 @@ export function * fetchMeetMapUsers (api, action) {
     yield put(MeetMapActions.meetMapFailure())
   }
 }
+
+export function * markGroupRoomMessageNotificationsRead (api, action) {
+  const { roomId } = action
+  // make the call to the api
+  const response = yield call(api.markAllGroupRoomNotificationsRead, roomId)
+
+  // success?
+  if (response.ok) {
+    yield put(ChatActions.markGroupRoomMessageNotificationsReadSuccess(response.data))
+  } else {
+    yield put(ChatActions.markGroupRoomMessageNotificationsReadFailure(response.data))
+  }
+}
+
+export function * fetchBareBoneChatUsers (api, action) {
+  const { data } = action
+  // make the call to the api
+  const response = yield call(api.fetchBareBoneChatUsers, data)
+
+  // success?
+  if (response.ok) {
+    yield put(MeetMapActions.fetchBareBoneChatUsersSuccess(response.data))
+  } else {
+    yield put(MeetMapActions.fetchBareBoneChatUsersFailure())
+  }
+}

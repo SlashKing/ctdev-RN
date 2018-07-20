@@ -9,6 +9,8 @@ import { hamburger} from '../Themes/Images';
 import { isInt } from '../Lib/TypeCheck';
 import I18n from '../I18n';
 
+import styles from './Styles/ProfileImageSwitcherStyles';
+
 export default class ProfileImageSwitcher extends Component{
   static propTypes={
     parent: PropTypes.func,
@@ -133,7 +135,7 @@ export default class ProfileImageSwitcher extends Component{
           style={styles.container}>
 
         <Image
-          style={{width:60, height:60, flexWrap:'wrap', borderRadius:30}}
+          style={styles.image}
           source={uri}
         />
         {item.selected && <View style={styles.overlay} pointerEvents='none' />}
@@ -149,13 +151,10 @@ export default class ProfileImageSwitcher extends Component{
 
   render(){
     return(
-      <View style={{flex:1}}>
+      <View style={styles.main}>
         <FlatList
-          columnWrapperStyle={{ justifyContent:'space-around' }}
-          contentContainerStyle={{
-            flexShrink:0,
-            justifyContent: 'center',
-            padding: 10}}
+          columnWrapperStyle={styles.columnWrapper}
+          contentContainerStyle={styles.contentContainer}
           data={this.state.images}
           horizontal={false}
           numColumns={3}
@@ -166,28 +165,3 @@ export default class ProfileImageSwitcher extends Component{
     )
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    width: 60,
-    height: 60,
-    margin:10,
-    flexWrap:'wrap',
-    borderRadius:35,
-    elevation:6,
-    backgroundColor:'#c3c3c380',
-    borderWidth:0.2,
-    borderColor:'lightgrey',
-    overflow:'visible'
-  },
-  imageContainer: {
-    flex: 1,
-    width: 60,
-    height: 60,
-  },
-  overlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(69,85,117,0.7)',
-    borderRadius: 30
-  }
-})

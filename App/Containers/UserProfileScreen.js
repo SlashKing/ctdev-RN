@@ -1,6 +1,6 @@
 import React from "react";
 import { connect } from "react-redux";
-import { Alert, PanResponder, RefreshControl, StatusBar, Animated, Platform, StyleSheet, Image, BackHandler, Dimensions, ScrollView, TouchableOpacity, findNodeHandle } from "react-native";
+import { Alert, RefreshControl, Animated, Platform, StyleSheet, BackHandler, Dimensions, TouchableOpacity, findNodeHandle } from "react-native";
 import {
 	Card,
 	CardItem,
@@ -15,11 +15,12 @@ import {
 	Right,
 	Body,
 } from "native-base";
+
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import ModalDropdown from 'react-native-modal-dropdown';
 import SlideUpPanel from '../Components/SlideUpPanel';
-import ProfileImagesComponent from '../Components/ProfileImagesComponent'
-import ProfileImageSwitcher from '../Components/ProfileImageSwitcher'
+import ProfileImagesComponent from '../Components/ProfileImagesComponent';
+import AnimatedProfileHeader from '../Components/AnimatedProfileHeader';
 import AppConfig from '../Config/AppConfig';
 import UserReportModal from '../Modals/UserReportModal';
 import ChatActions from '../Redux/ChatRedux';
@@ -62,12 +63,14 @@ class UserProfileScreen extends React.Component {
       refreshing: false,
 		}
 	}
+
 	componentDidMount() {
 		BackHandler.addEventListener("hardwareBackPress", () => {
 			this.props.navigation.goBack();
 			return true;
 		});
 	}
+
   _onDropdownSelect(idx, value, user, roomId){
     switch (idx){
       case "0": // Block User
@@ -122,6 +125,7 @@ class UserProfileScreen extends React.Component {
   _renderFooter(){
     return null
   }
+
   _onDrag = (value) =>{
     if (value >= 400 && this.state.upDownIcon === 'arrow-expand-up') {
       this.setState({ upDownIcon: 'arrow-collapse-down' })
@@ -138,13 +142,15 @@ class UserProfileScreen extends React.Component {
     return (
         <View style={styles.footer}>
           <View style={styles.panelHeader}>
-            {!isCurrentUser && hasVoted &&(
+            {hasVoted &&(
               <ModalDropdown style={{flex:1}} options={options} onSelect={(idx, value) => this._onDropdownSelect(idx, value, user, room.id)}>
                 <Icon name={'dots-vertical'} style={{textAlign:'center'}} size={25}/>
               </ModalDropdown>)
             }
-             <Animated.View style={{flex:3}}{...dragHandlers}><Icon name={this.state.upDownIcon} size={25} style={{color: '#FFF', textAlign:'center'}}/></Animated.View>
-            {!isCurrentUser && hasVoted && (<TouchableOpacity  style={{flex:1}} onPress={()=>navigation.navigate("ChatRoomScreen", {room:{...room}})}>
+             <Animated.View style={{flex:3}}{...dragHandlers}>
+               <Icon name={this.state.upDownIcon} size={25} style={{color: '#FFF', textAlign:'center'}}/>
+             </Animated.View>
+            {hasVoted && (<TouchableOpacity  style={{flex:1}} onPress={()=>navigation.navigate("ChatRoomScreen", {room:{...room}})}>
             <Icon style={{ textAlign:'center'}} name={'comment-outline'} size={25}/></TouchableOpacity>)}
           </View>
           <Animated.ScrollView style={[
@@ -169,16 +175,12 @@ class UserProfileScreen extends React.Component {
   _renderProfileAbout(){
     const { profile } = this.state
     const aboutMe = profile.about_me == null ? '' : `\t${profile.about_me}`;
-    return (<View style={_styles.info}>
-             <Label>About Me</Label>
-             <Text style={_styles.aboutText}>{ aboutMe }</Text>
-             <ProfileImageSwitcher
-               navigation={this.props.navigation}
-               setPriority={this.props.switchPriority}
-               images={this.props.isCurrentUser ? this.props.currentUser.profile.images : profile.images}
-               success={this.props.profileSuccess}
-               resetSuccess={this.props.resetLoginSuccess}/>
-           </View>)
+    return (
+      <View style={_styles.info}>
+        <Label>About Me</Label>
+        <Text style={_styles.aboutText}>{ aboutMe }</Text>
+      </View>
+    )
   }
   measureScrollView() {
     // Use RCTUIManager and findNodeHandle because of a bug that results in the measure
@@ -209,43 +211,6 @@ class UserProfileScreen extends React.Component {
       Platform.OS === 'ios' ? HEADER_MAX_HEIGHT : 0,
     );
 
-    const headerTranslate = scrollY.interpolate({
-      inputRange: [0, HEADER_SCROLL_DISTANCE],
-      outputRange: [0, -HEADER_SCROLL_DISTANCE],
-      extrapolate: 'clamp',
-    });
-    const footerTranslate = scrollY.interpolate({
-      inputRange: [scrollViewSize>0 ? Math.abs(scrollViewSize/2) :0 , scrollViewSize > 0 ? scrollViewSize : 0],
-      outputRange: [0, -HEADER_MAX_HEIGHT],
-      extrapolate: 'clamp',
-    });
-    const footerHeightTranslate = footerScrollY.interpolate({
-      inputRange: [0, scrollViewSize2],
-      outputRange: [-40, -400],
-      extrapolate: 'clamp',
-    });
-    console.log(scrollViewSize, scrollViewSize2)
-    const imageOpacity = scrollY.interpolate({
-      inputRange: [0, HEADER_SCROLL_DISTANCE / 2, HEADER_SCROLL_DISTANCE],
-      outputRange: [1, 1, 0],
-      extrapolate: 'clamp',
-    });
-    const imageTranslate = scrollY.interpolate({
-      inputRange: [0, HEADER_SCROLL_DISTANCE],
-      outputRange: [0, 100],
-      extrapolate: 'clamp',
-    });
-
-    const titleScale = scrollY.interpolate({
-      inputRange: [0, HEADER_SCROLL_DISTANCE / 2, HEADER_SCROLL_DISTANCE],
-      outputRange: [1, 1, 0.8],
-      extrapolate: 'clamp',
-    });
-    const titleTranslate = scrollY.interpolate({
-      inputRange: [0, HEADER_SCROLL_DISTANCE / 2, HEADER_SCROLL_DISTANCE],
-      outputRange: [-60, 0, HEADER_SCROLL_DISTANCE],
-      extrapolate: 'clamp',
-    });
 		return (
 		<View style={styles.fill} onLayout={this._onLayout}>
 		  <Animated.ScrollView
@@ -278,33 +243,7 @@ class UserProfileScreen extends React.Component {
         <ProfileImagesComponent images={profile.images} layout={layout}/>
       </Card>
 			</Animated.ScrollView>
-			<Animated.View
-        style={[
-          styles.header,
-          { transform: [{translateY: headerTranslate }] },
-        ]}
-      >
-      <Animated.Image
-        style={[
-          styles.backgroundImage,
-          {
-            opacity: imageOpacity,
-            transform: [{ translateY: imageTranslate }],
-          },
-        ]}
-        source={{uri: cover}}
-      />
-        <Animated.View
-          style={[
-            styles.bar,
-            {
-              transform: [
-                //{ scale: titleScale },
-                { translateY: titleTranslate },
-              ],
-            },
-          ]}
-        >
+			<AnimatedProfileHeader coverImage={cover} scrollViewSize={scrollViewSize} scrollY={scrollY}>
 			    <View style={_styles.info2}>
             <Left style={_styles.profileLeft}>
               <TouchableOpacity onPress={()=>this.props.navigation.goBack()}>
@@ -319,17 +258,17 @@ class UserProfileScreen extends React.Component {
               </View>
             </Right>
           </View>
-        </Animated.View>
-      </Animated.View>
+        </AnimatedProfileHeader>
         <SlideUpPanel
-          visible showBackdrop={false}
+          ref={el=>this._slidePanel=el}
+          visible showBackdrop={true}
           draggableRange={{
-            top: 400,
-            bottom: 40
+            top: layout.height,
+            bottom: 60
           }}
-          onDrag={this._onDrag}
           height={400}
           startCollapsed={true}
+          onRequestClose={()=>this._slidePanel.transitionTo(-HEADER_MIN_HEIGHT)}
           children={this._renderSlideUpPanel}
         />
         <UserReportModal

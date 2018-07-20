@@ -12,6 +12,7 @@
 
 import { call, put } from 'redux-saga/effects';
 import SwipeActions from '../Redux/SwipeRedux';
+import ChatActions from '../Redux/ChatRedux';
 import {isLoggedIn} from '../Redux/LoginRedux';
 
 export function * fetchUsers (api, action) {

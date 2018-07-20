@@ -11,6 +11,8 @@ import MeetMeScreen from "../Containers/MeetMeScreen";
 //Chat Stack
 import ChatScreen from "../Containers/ChatScreen";
 import ChatRoomScreen from "../Containers/ChatRoomScreen";
+import GroupChatScreen from "../Containers/GroupChatScreen";
+import GroupChatRoomScreen from "../Containers/GroupChatRoomScreen";
 import CameraScreen from "../Containers/CameraScreen";
 
 
@@ -28,6 +30,13 @@ import SignupScreen from "../Containers/SignupScreen";
 
 import styles from "./Styles/NavigationStyles";
 
+
+/* #########################################
+ * ChatStack
+ *
+ *
+ *
+ * ######################################### */
 const ChatStack = StackNavigator({
     ChatScreen: {screen:ChatScreen},
     ChatRoomScreen: {screen:ChatRoomScreen},
@@ -39,6 +48,31 @@ const ChatStack = StackNavigator({
     headerMode: "none"
   }
 )
+
+/* #########################################
+ * GroupChatStack
+ *
+ *
+ *
+ * ######################################### */
+const GroupChatStack = StackNavigator({
+    MeetMeChatScreen: {screen:GroupChatScreen},
+    MeetMeChatRoomScreen: {screen:GroupChatRoomScreen},
+    MeetMeUserProfileScreen: {screen:UserProfileScreen},
+    MeetMeCameraScreen: {screen: CameraScreen}
+  },
+  {
+    initialRouteName: "MeetMeChatScreen",
+    headerMode: "none"
+  }
+)
+
+/* #########################################
+ *
+ * SwipeStack
+ *
+ *
+ * ######################################### */
 const SwipeStack = StackNavigator({
     SwipeScreen: {screen:SwipeScreen},
     UserProfileScreen: {screen:UserProfileScreen}
@@ -48,6 +82,13 @@ const SwipeStack = StackNavigator({
 	  headerMode:"none"
 	}
 );
+
+/* #########################################
+ *
+ * UserStack
+ *
+ *
+ * ######################################### */
 const UserStack = StackNavigator({
     EditProfileScreen: {screen:EditProfileScreen},
     ProfileCameraScreen: {screen:ProfileCameraScreen}
@@ -58,11 +99,14 @@ const UserStack = StackNavigator({
   }
 );
 
+/* #########################################
+ *
+ * MeetMeStack
+ *
+ *
+ * ######################################### */
 const MeetMeStack = StackNavigator({
     MeetMeScreen: {screen:MeetMeScreen},
-    MeetMeChatScreen: {screen:ChatScreen},//TODO:
-    MeetMeChatRoomScreen: {screen:ChatRoomScreen},//TODO:
-    UserProfileScreen: {screen:UserProfileScreen},
   },
   {
 	  initialRouteName: "MeetMeScreen",
@@ -72,10 +116,11 @@ const MeetMeStack = StackNavigator({
 
 const NavigationDrawer = DrawerNavigator({
     //LoginScreen: { screen: AuthStack},
-    ChatStack: { screen: ChatStack },
 		SwipeStack: { screen: SwipeStack },
+    ChatStack: { screen: ChatStack },
+		MeetMeStack: { screen: MeetMeStack},
+		GroupChatStack: { screen: GroupChatStack},
 		UserStack: { screen: UserStack},
-		MeetMeScreen: { screen: MeetMeScreen}
 	},
 	{
 		initialRouteName: "SwipeStack",
