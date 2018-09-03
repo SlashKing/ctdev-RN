@@ -5,10 +5,21 @@ export default {
     backgroundColor: '#fff'
   },
   logoWrap:{
-    elevation: 10,
+    alignSelf:'center',
+    elevation: 9,
   },
   logo: {
-    width: 260,
-    resizeMode: 'contain'
+    height:100,
+    width: 100,
+    borderRadius:50,
+    //resizeMode: 'contain'
+  },
+  row:{
+    flex:1,
+    flexDirection:'row',
+    marginLeft:20,
+  },
+  end:{
+    alignSelf: 'flex-end'
   }
 }

@@ -45,23 +45,23 @@ export default class SwipeCard extends React.Component {
     							  <Thumbnail source={{uri: this.props.profile.profile_image }} />
     							</TouchableOpacity>
     						</View>
-    					  <View style={styles.info2}>
+    					  <View style={styles.info}>
                    <Text style={styles.usernameText}>{`\t${this.props.username}`}</Text>
     					    <View style={styles.ageDistanceAside}>
     					  	  <Text style={styles.ageText}>{this.props.profile.age}</Text>
     					      <Text style={styles.kmText}>{`${this.props.profile.distance} km away`}</Text>
     					    </View>
     					  </View>
-    						<View style={styles.info}>
-    							{/* this.props.likes == null ? <Text>Nothing liked on Facebook? Weird</Text> :
+    						{/*
+    						<View style={styles.info}>this.props.likes == null ? <Text>Nothing liked on Facebook? Weird</Text> :
                     ''
                     TODO:loop through facebook likes, truncate at 3,
-                       TODO: match the current user's likes using javascript sorting function */
-                  }
+                       TODO: match the current user's likes using javascript sorting function
+
                    <Text style={styles.aboutText}>
                      {about}
                    </Text>
-    					  </View>
+    					  </View>*/ }
 
     					</View>
     				</View>

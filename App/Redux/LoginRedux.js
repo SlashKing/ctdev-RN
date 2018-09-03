@@ -91,7 +91,7 @@ export const success = (state, action) =>
     error: null,
     currentUser: action.data.user,
     isNew: action.data.is_new,
-    expiry:action.data.token_dec.exp,
+    expiry:action.data.expiry,
     isAuthenticated: action.data.token ? true :false
   })
 
@@ -122,7 +122,7 @@ export const checkSocialLoginRequest = (state) => state.merge({ fetching: true }
 export const checkSocialLoginSuccess = (state, action) => state.merge({
   fetching: false,
   error: null,
-  expiry:action.data.token_dec.exp,
+  expiry:action.data.expiry,
   currentUser: action.data.user,
   isNew: action.data.is_new,
   isAuthenticated: action.data.token ? true : false,

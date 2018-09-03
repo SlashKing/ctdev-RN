@@ -5,28 +5,23 @@ import PropTypes from 'prop-types';
 import { Modal, TouchableOpacity, Text, View } from 'react-native';
 import { Container, Content, Button, Thumbnail, Toast } from 'native-base';
 
-import styles from './Styles/MeetMapCreateModalStyles'
+import styles from './Styles/JRACreateModalStyles'
 import I18n from '../I18n';
 
-export default class JoinRequestApproval extends Component {
+export default class JRACreateModal extends Component {
 
   static propTypes={
-    createGroup: PropTypes.func.isRequired,
+    createJRA: PropTypes.func.isRequired,
     goToRoom: PropTypes.func.isRequired,
-    resetGroupModalProps: PropTypes.func.isRequired,
-    currentRequestApprovals: PropTypes.array,
-    currentLocation: PropTypes.object,
-    isPoi: PropTypes.bool.isRequired,
+    resetProps: PropTypes.func.isRequired,
+    currentRoom: PropTypes.object,
     containerStyle: PropTypes.object,
     success: PropTypes.bool.string
   }
 
   static defaultProps={
-    isPoi: false,
     goToRoom: ()=>null,
     currentRoom: null,
-    currentLocation: null,
-    currentRequestApprovals: [],
     containerStyle: {}
   }
 

@@ -78,6 +78,8 @@ class SlideUpPanel extends React.Component {
     this._flick = new FlickAnimation(this._translateYAnimation, -top, -bottom)
 
     this._panResponder = PanResponder.create({
+      onStartShouldSetPanResponder: (e, gestureState) => true, // works in modal when we add this as per github comment
+      onPanResponderEnd: (e, gestureState) => true,            // link: https://github.com/facebook/react-native/issues/9786#issuecomment-262932857
       onMoveShouldSetPanResponder: this._onMoveShouldSetPanResponder.bind(this),
       onPanResponderGrant: this._onPanResponderGrant.bind(this),
       onPanResponderMove: this._onPanResponderMove.bind(this),

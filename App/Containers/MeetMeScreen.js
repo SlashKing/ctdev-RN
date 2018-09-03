@@ -1,15 +1,13 @@
 import React from 'react'
 import {connect} from 'react-redux'
-import { View, Dimensions } from 'react-native'
 import MeetMap from '../Components/MeetMap'
 
 
-// Example
 class MeetMeScreen extends React.Component {
   render(){
     return (
-      <MeetMap />
+      <MeetMap navigation={this.props.navigation}/>
     )
   }
 }
-export default MeetMeScreen
+export default connect(null,null)(MeetMeScreen)

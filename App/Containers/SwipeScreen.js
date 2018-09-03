@@ -125,6 +125,7 @@ class SwipeScreen extends React.Component {
   renderMatchModal(){
     let {
       createChatRoom,
+      remainingMatches,
       resetMatch,
       mega_match,
       currentMatch,
@@ -137,12 +138,13 @@ class SwipeScreen extends React.Component {
         ref={el=>this.matchModal = el}
         containerStyle={{ backgroundColor: mega_match ? Colors.loGreen : Colors.loBlue }}
         resetMatch={resetMatch}
+        remainingMatches={remainingMatches}
         currentMatch={currentMatch}
         currentRoom={currentRoom}
         createChatRoom={createChatRoom}
         megaMatch={mega_match}
         goToChatRoom={()=>{
-            resetMatch();
+            resetMatch(true);
             navigation.navigate("ChatRoomScreen", {room: currentRoom});
           }
         }
@@ -213,6 +215,7 @@ const mapStateToProps = (state) => {
     matched: state.swipe.matched,
     mega_match: state.swipe.mega_match,
     currentMatch: state.swipe.currentMatch,
+    remainingMatches: state.swipe.remainingMatches,
     currentRoom: state.chat.currentRoom
   }
 };
@@ -220,7 +223,7 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
   return {
     swipe:(vote, this_user, user, content_type)=> dispatch(SwipeActions.swipeRequest(vote, this_user, user, content_type)),
-    resetMatch: () => dispatch(SwipeActions.resetMatchSuccess()),
+    resetMatch: (closingModal=false) => dispatch(SwipeActions.resetMatchSuccess(closingModal)),
     fetchUsers:() => dispatch(SwipeActions.fetchUsersRequest()),
     updateLocation: (id, latitude, longitude) => dispatch(
           LoginActions.locationRequest({

@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native'
+import { StyleSheet, Dimensions } from 'react-native'
 import { Fonts, Colors } from '../../Themes/'
 
 export default StyleSheet.create({
@@ -14,9 +14,11 @@ export default StyleSheet.create({
     alignItems: 'center'
   },
   textarea:{
-    backgroundColor: 'white'
+    width:Dimensions.get('window').width,
+    padding: 10,
+    backgroundColor: Colors.snow
   },
-  usernameText: {paddingLeft: 4 , fontFamily: Fonts.type.lobster,},
+  usernameText: {paddingLeft: 4 , color: Colors.steel, fontFamily: Fonts.type.lobster,},
   avatar:{
     height:150,
     width: 150,
@@ -29,33 +31,38 @@ export default StyleSheet.create({
     alignItems: 'center'
   },
   buttonRow:{
-    flex:2,
-    flexGrow:1,
+    position:'absolute',
+    left:0,
+    bottom:0,
+    margin:0,
+    padding:0,
+    flex:1,
     flexDirection:'row',
-    justifyContent: 'center',
-    alignItems: 'center'
+    justifyContent: 'center'
+  },
+  danger:{
+    backgroundColor: Colors.indian,
+    borderColor: Colors.coal,
   },
   button:{
     flex:1,
+    flexDirection:'column',
     borderTopWidth:0.3,
     borderBottomWidth:0.3,
-    borderLeftWidth: 0,
+    borderRightWidth: 0,
     borderRightWidth:0.3,
-    borderColor: Colors.coal,
     borderRadius:0,
     backgroundColor: Colors.steel,
-    alignSelf: 'center'
+    borderColor: Colors.coal,
+    justifyContent:'center',
+    alignItems:'center'
   },
   buttonRight:{
-    flex:1,
-    borderTopWidth:0.3,
-    borderBottomWidth:0.3,
-    borderLeftWidth: 0,
-    borderRightWidth:0,
+    borderLeftWidth:0,
+  },
+  success:{
+    backgroundColor: Colors.loGreen,
     borderColor: Colors.coal,
-    borderRadius:0,
-    backgroundColor: Colors.steel,
-    alignSelf: 'center'
   },
   buttonText:{
     color: Colors.coal,
